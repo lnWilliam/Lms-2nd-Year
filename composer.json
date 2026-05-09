@@ -1,0 +1,11 @@
+{
+  "name": "danchan23/namespacesample",
+  "description": "sample",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "require": {}
+}
