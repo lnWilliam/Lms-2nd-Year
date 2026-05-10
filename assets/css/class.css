@@ -329,25 +329,106 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+
+/* Desktop */
+@media (min-width: 992px) {
+    .lms-main {
+        max-width: 1200px;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+    .lms-main {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
     .announcement-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
     
     .teacher-panel .btn {
         font-size: 0.85rem;
         padding: 0.5rem 0.75rem;
     }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .lms-main {
+        padding: calc(var(--lms-topbar-stack) + 1rem) 0.75rem 0.75rem 0.75rem;
+    }
+    
+    .teacher-panel .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .announcement-card {
+        padding: 0.75rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .announcement-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .announcement-title {
+        font-size: 0.95rem;
+    }
+    
+    .announcement-content {
+        font-size: 0.9rem;
+    }
     
     .class-code-display h2 {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
     
     .attachment-preview {
-        max-width: 150px;
-        max-height: 100px;
+        max-width: 120px;
+        max-height: 80px;
+    }
+    
+    .new-announcement-btn {
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .teacher-panel .btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .announcement-card {
+        padding: 0.6rem !important;
+    }
+    
+    .announcement-title {
+        font-size: 0.9rem;
+    }
+    
+    .announcement-content {
+        font-size: 0.85rem;
+    }
+    
+    .class-code-display h2 {
+        font-size: 1rem;
+    }
+    
+    .attachment-preview {
+        max-width: 100px;
+        max-height: 70px;
     }
 }
 

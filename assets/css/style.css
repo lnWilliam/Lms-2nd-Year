@@ -252,20 +252,183 @@ button:hover{
 }
 
 
-/* Mobile: allow scroll + safe areas (viewport-fit=cover in login.php) */
-@media (max-width: 960px) {
+/* Responsive Design */
+
+/* Desktop */
+@media (min-width: 992px) {
+    .container {
+        width: 900px;
+        height: 600px;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container {
+        width: 100%;
+        max-width: 700px;
+        height: 550px;
+        margin: 1rem;
+    }
+    
+    .panel {
+        padding: 40px;
+    }
+    
+    .midPanel h1 {
+        font-size: 2rem;
+    }
+    
+    .social i {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
     body {
         overflow-y: auto;
         overflow-x: hidden;
         align-items: flex-start;
-        padding: max(0.75rem, env(safe-area-inset-top, 0px))
-            max(0.75rem, env(safe-area-inset-right, 0px))
-            max(0.75rem, env(safe-area-inset-bottom, 0px))
-            max(0.75rem, env(safe-area-inset-left, 0px));
+        padding: 1rem 0.5rem;
     }
-
+    
     .container {
-        width: min(100% - 1.5rem, 900px);
-        margin: 0.5rem auto;
+        width: 100%;
+        height: auto;
+        min-height: 500px;
+        margin: 0;
+        border-radius: 16px;
+    }
+    
+    .panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 30px 20px;
+        transform: none !important;
+    }
+    
+    .leftPanel {
+        order: 1;
+    }
+    
+    .midPanel {
+        order: 0;
+        background: rgba(255,255,255,0.1);
+        padding: 40px 20px;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .rightPanel {
+        order: 2;
+        display: none;
+    }
+    
+    #toggle:checked ~ .leftPanel { 
+        transform: none !important; 
+        display: none;
+    }
+    
+    #toggle:checked ~ .midPanel { 
+        transform: none !important;
+        display: none;
+    }
+    
+    #toggle:checked ~ .rightPanel { 
+        transform: none !important;
+        display: block;
+        order: 1;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.8rem;
+    }
+    
+    .midPanel p {
+        font-size: 0.9rem;
+    }
+    
+    .social i {
+        width: 36px;
+        height: 36px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    
+    input {
+        padding: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    button {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .switch {
+        font-size: 0.9rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .container {
+        border-radius: 12px;
+        min-height: 450px;
+    }
+    
+    .panel {
+        padding: 25px 15px;
+    }
+    
+    .midPanel {
+        padding: 30px 15px;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    .social {
+        gap: 10px;
+    }
+    
+    .social i {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    form {
+        gap: 12px;
+    }
+    
+    .input-box input {
+        padding: 12px 10px;
+        font-size: 16px;
+    }
+    
+    .input-box label {
+        left: 10px;
+        font-size: 13px;
+    }
+    
+    .input-box input:focus + label,
+    .input-box input:valid + label {
+        top: -10px;
+        font-size: 11px;
     }
 }
