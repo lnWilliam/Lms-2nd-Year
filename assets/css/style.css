@@ -254,25 +254,38 @@ button:hover{
 
 /* Responsive Design */
 
-/* Desktop */
-@media (min-width: 992px) {
+/* Large Desktop */
+@media (min-width: 1200px) {
     .container {
         width: 900px;
         height: 600px;
     }
 }
 
-/* Tablets */
+/* Desktop */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .container {
+        width: 850px;
+        height: 580px;
+    }
+}
+
+/* Tablets Landscape */
 @media (min-width: 768px) and (max-width: 991px) {
+    body {
+        align-items: center;
+        padding: 1rem;
+    }
+    
     .container {
         width: 100%;
         max-width: 700px;
         height: 550px;
-        margin: 1rem;
+        margin: 0 auto;
     }
     
     .panel {
-        padding: 40px;
+        padding: 35px;
     }
     
     .midPanel h1 {
@@ -285,8 +298,8 @@ button:hover{
     }
 }
 
-/* Mobile */
-@media (max-width: 767px) {
+/* Tablets Portrait */
+@media (min-width: 600px) and (max-width: 767px) {
     body {
         overflow-y: auto;
         overflow-x: hidden;
@@ -298,15 +311,16 @@ button:hover{
         width: 100%;
         height: auto;
         min-height: 500px;
-        margin: 0;
+        margin: 0 auto;
         border-radius: 16px;
+        max-width: 600px;
     }
     
     .panel {
         position: relative;
         width: 100%;
         height: auto;
-        padding: 30px 20px;
+        padding: 30px 25px;
         transform: none !important;
     }
     
@@ -317,7 +331,7 @@ button:hover{
     .midPanel {
         order: 0;
         background: rgba(255,255,255,0.1);
-        padding: 40px 20px;
+        padding: 35px 25px;
         border-radius: 16px 16px 0 0;
     }
     
@@ -362,7 +376,97 @@ button:hover{
     
     input {
         padding: 12px;
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
+    }
+    
+    button {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .switch {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+    body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        align-items: flex-start;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .container {
+        width: 100%;
+        height: auto;
+        min-height: 480px;
+        margin: 0;
+        border-radius: 16px;
+    }
+    
+    .panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 25px 20px;
+        transform: none !important;
+    }
+    
+    .leftPanel {
+        order: 1;
+    }
+    
+    .midPanel {
+        order: 0;
+        background: rgba(255,255,255,0.1);
+        padding: 30px 20px;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .rightPanel {
+        order: 2;
+        display: none;
+    }
+    
+    #toggle:checked ~ .leftPanel { 
+        transform: none !important; 
+        display: none;
+    }
+    
+    #toggle:checked ~ .midPanel { 
+        transform: none !important;
+        display: none;
+    }
+    
+    #toggle:checked ~ .rightPanel { 
+        transform: none !important;
+        display: block;
+        order: 1;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.6rem;
+    }
+    
+    .midPanel p {
+        font-size: 0.9rem;
+    }
+    
+    .social i {
+        width: 34px;
+        height: 34px;
+    }
+    
+    h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+    
+    input {
+        padding: 12px;
+        font-size: 16px;
     }
     
     button {
@@ -387,11 +491,11 @@ button:hover{
     }
     
     .panel {
-        padding: 25px 15px;
+        padding: 20px 15px;
     }
     
     .midPanel {
-        padding: 30px 15px;
+        padding: 25px 15px;
     }
     
     .midPanel h1 {
@@ -430,5 +534,39 @@ button:hover{
     .input-box input:valid + label {
         top: -10px;
         font-size: 11px;
+    }
+}
+
+/* Ultra Small Mobile */
+@media (max-width: 360px) {
+    body {
+        padding: 0.25rem;
+    }
+    
+    .container {
+        border-radius: 8px;
+        min-height: 420px;
+    }
+    
+    .panel {
+        padding: 15px 12px;
+    }
+    
+    .midPanel {
+        padding: 20px 12px;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.3rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .social i {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
     }
 }
