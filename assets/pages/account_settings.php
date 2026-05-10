@@ -20,26 +20,8 @@ $user = $_SESSION['user_data'];
     <title>LMS Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/account_settings.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <style>
-        .sidebar a.active {
-            background-color: grey;
-            color: white;
-        }
-
-        .dropdown-menu li:nth-child(2) a {
-            background-color: grey;
-        }
-
-        .dropdown-menu li:nth-child(2) a:hover {
-            background-color: grey;
-            color: black;
-        }
-        .info{
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
 </head>
 
 <body>

@@ -126,14 +126,9 @@ if (isset($_GET['delete_post'])) {
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/class.css">
     <link rel="stylesheet" href="../css/upload.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <style>
-        .sidebar a.active {
-            background: grey;
-            color: white;
-        }
-    </style>
 </head>
 
 <body>
