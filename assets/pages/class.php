@@ -91,6 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
     exit();
 }
 
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
 
     $post_id = $_POST['delete_post_id'];
