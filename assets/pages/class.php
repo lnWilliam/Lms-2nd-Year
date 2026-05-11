@@ -40,6 +40,7 @@ foreach ($classes as $c) {
         break;
     }
 }
+$students = $classModel->getStudents($class_id);
 
 if (!$currentClass) {
     die("Unauthorized access.");
@@ -201,7 +202,19 @@ if (isset($_GET['delete_post'])) {
 
             <p><?php echo htmlspecialchars($currentClass['class_desc']); ?></p>
         </div>
-
+        <div class='row shadow p-3 mb-3 bg-body-tertiary rounded mx-0'>
+            <ul class="nav gap-5" >
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Stream</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Classwork</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id='getStudents'>Student</a>
+                </li>
+            </ul>
+        </div>
         <div class="row">
 
             <!-- LEFT PANEL -->
@@ -471,7 +484,7 @@ if (isset($_GET['delete_post'])) {
                                     <?php endforeach; ?>
 
                                 </ul>
-                                
+
                             </div>
 
 
@@ -483,7 +496,7 @@ if (isset($_GET['delete_post'])) {
                                 🗑 Delete
                             </a>
                         <?php endif; ?>
-                       
+
                     </div>
 
                 <?php endforeach; ?>
@@ -491,12 +504,12 @@ if (isset($_GET['delete_post'])) {
             </div>
 
         </div>
-    
+
     </main>
     <script src="../js/upload.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src='../js/animate.js'></script>
-    
+
 </body>
 
 </html>
