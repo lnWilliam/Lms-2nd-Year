@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded',()=>{
+
 const topImage = document.getElementById("topImage");
 
     window.addEventListener("scroll", () => {
@@ -11,14 +12,17 @@ const topImage = document.getElementById("topImage");
     let percent = 100 - (progress * 100);
 
     // reveal from bottom
-    topImage.style.clipPath = `inset(${percent}% 0 0 0)`;
+    if (topImage) {
+      topImage.style.clipPath = `inset(${percent}% 0 0 0)`;
+    }
 });
 
 const classStatus = document.getElementById('classStatus');
 const class_name = document.getElementById('class_name') ?? "";
 let timeoutId;
 
-document.getElementById('class_name').addEventListener('input',function(){
+if (class_name) {
+  class_name.addEventListener('input',function(){
                 const name = this.value;
                 if (timeoutId) {
                     clearTimeout(timeoutId);
@@ -41,6 +45,7 @@ document.getElementById('class_name').addEventListener('input',function(){
                 }, 500);
 
 })
+}
 function checkClassName(className){
      fetch('../../src/APIs/UserAPI.php', {
                     method: 'POST',

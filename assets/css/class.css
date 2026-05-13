@@ -333,7 +333,7 @@
 /* Large Desktop */
 @media (min-width: 1200px) {
     .lms-main {
-        max-width: 1400px;
+        max-width: none;
         padding-left: 2rem;
         padding-right: 2rem;
     }
@@ -342,7 +342,7 @@
 /* Desktop */
 @media (min-width: 992px) and (max-width: 1199px) {
     .lms-main {
-        max-width: 1200px;
+        max-width: none;
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
