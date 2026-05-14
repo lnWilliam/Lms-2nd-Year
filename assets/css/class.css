@@ -330,10 +330,9 @@
 
 /* Responsive Design */
 
-/* Large Desktop */
+/* Large Desktop — align with home.css main column cap */
 @media (min-width: 1200px) {
     .lms-main {
-        max-width: none;
         padding-left: 2rem;
         padding-right: 2rem;
     }
@@ -342,9 +341,8 @@
 /* Desktop */
 @media (min-width: 992px) and (max-width: 1199px) {
     .lms-main {
-        max-width: none;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
+        padding-left: 1.75rem;
+        padding-right: 1.75rem;
     }
 }
 
@@ -635,4 +633,61 @@
     height: 100%;
     background: linear-gradient(90deg, var(--lms-brand), var(--lms-brand-2));
     transition: width 0.3s ease;
+}
+
+/* Fine diagonal mesh over class page main (extends home.css) */
+.main.lms-main {
+    background-image: repeating-linear-gradient(
+        -14deg,
+        transparent,
+        transparent 52px,
+        rgba(14, 165, 233, 0.022) 52px,
+        rgba(14, 165, 233, 0.022) 53px
+    );
+}
+
+@media (min-width: 992px) {
+    .main.lms-main .lms-hero .badge {
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 0.4em 0.65em;
+        border-radius: 999px;
+        vertical-align: middle;
+        margin-left: 0.35rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
+
+    .main.lms-main .col-md-3 > .card {
+        border-radius: var(--lms-radius);
+        border: 1px solid var(--lms-border);
+        box-shadow: var(--lms-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .main.lms-main .col-md-3 > .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+    }
+
+    .main.lms-main .col-md-9 > .btn-success {
+        border: none;
+        border-radius: 999px;
+        font-weight: 600;
+        padding: 0.52rem 1.35rem;
+        background: linear-gradient(135deg, #059669, var(--lms-brand-2));
+        box-shadow: 0 8px 22px rgba(5, 150, 105, 0.28);
+    }
+
+    .main.lms-main .col-md-9 > .btn-success:hover {
+        filter: brightness(1.05);
+        color: #fff;
+    }
+
+    .teacher-panel {
+        border-radius: calc(var(--lms-radius) + 2px);
+    }
+
+    .class-code-display {
+        border-radius: calc(var(--lms-radius) + 2px);
+    }
 }

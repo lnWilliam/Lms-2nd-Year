@@ -29,6 +29,9 @@ $user = $_SESSION['user_data'];
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light lms-topbar fixed-top px-3">
         <div class="container-fluid gap-2 align-items-center lms-topbar-inner">
+            <button class="navbar-toggler d-lg-none lms-sidebar-toggler flex-shrink-0" type="button" aria-controls="Primary navigation" aria-expanded="false" aria-label="Open side navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <a class="navbar-brand d-flex align-items-center flex-shrink-0" href="home.php">
                 <span class="brand-mark" aria-hidden="true">◆</span>
                 MyLMS
@@ -42,15 +45,11 @@ $user = $_SESSION['user_data'];
 
             <button class="btn btn-lms-ghost d-lg-none flex-shrink-0 px-2 lms-mobile-more-btn" type="button" data-bs-toggle="collapse" data-bs-target="#lmsMobileNavMore" aria-controls="lmsMobileNavMore" aria-expanded="false" aria-label="Account menu">⋯</button>
 
-            <button class="navbar-toggler d-lg-none lms-sidebar-toggler flex-shrink-0" type="button" aria-controls="Primary navigation" aria-expanded="false" aria-label="Open side navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
             <div class="collapse lms-mobile-nav-drawer d-lg-none w-100" id="lmsMobileNavMore">
                 <div class="lms-mobile-nav-drawer-inner d-flex flex-column gap-2">
                     <a class="btn btn-lms-ghost w-100 text-start" href="home.php">+ Class</a>
                     <div class="dropdown">
-                        <a class="btn dropdown-toggle w-100 text-start" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
+                        <a class="btn dropdown-toggle w-100 text-start" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="true" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
                         <ul class="dropdown-menu dropdown-menu-end w-100">
                             <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
                             <li><a class="dropdown-item" href="#">Preferences</a></li>
@@ -86,7 +85,7 @@ $user = $_SESSION['user_data'];
         <a href="#"><span class="nav-ico" aria-hidden="true">▤</span> Terms and Condition</a>
         <a href="home.php"><span class="nav-ico" aria-hidden="true">◎</span> Home</a>
         <p class="sidebar-label" style="margin-top:1rem">Account</p>
-        <a href="#"><span class="nav-ico" aria-hidden="true">⚙</span> Settings and Privacy</a>
+        <a href="settings.php"><span class="nav-ico" aria-hidden="true">⚙</span> Settings and Privacy</a>
     </aside>
 
     <!-- MAIN -->

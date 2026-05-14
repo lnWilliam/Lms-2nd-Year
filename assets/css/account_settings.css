@@ -764,3 +764,58 @@
         border-width: 2px;
     }
 }
+
+/* Soft diagonal mesh on account main (extends home.css) */
+.main.lms-main {
+    background-image: repeating-linear-gradient(
+        11deg,
+        transparent,
+        transparent 60px,
+        rgba(15, 118, 110, 0.024) 60px,
+        rgba(15, 118, 110, 0.024) 61px
+    );
+}
+
+@media (min-width: 992px) {
+    .main.lms-main .lms-hero {
+        margin-bottom: 1.75rem;
+    }
+
+    .main.lms-main .stat-box > .card {
+        border-radius: var(--lms-radius) !important;
+        border: 1px solid var(--lms-border) !important;
+        padding: 2rem 2.25rem !important;
+        box-shadow: var(--lms-shadow) !important;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .main.lms-main .stat-box > .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 42px rgba(15, 23, 42, 0.1) !important;
+    }
+
+    .main.lms-main .form-label.fw-bold {
+        color: var(--lms-muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 0.3rem;
+    }
+
+    .main.lms-main .form-control-plaintext.border-bottom {
+        border-color: var(--lms-border) !important;
+        padding-bottom: 0.4rem;
+        font-size: 1rem;
+    }
+
+    .main.lms-main .info a {
+        font-weight: 600;
+        color: var(--lms-brand);
+        text-decoration: none;
+    }
+
+    .main.lms-main .info a:hover {
+        color: var(--lms-brand-2);
+        text-decoration: underline;
+    }
+}

@@ -1,7 +1,8 @@
 /**
- * Mobile Menu Toggle Handler
- * Hamburger (.lms-sidebar-toggler) opens the left sidebar only.
- * Top-nav account/class panel uses Bootstrap collapse separately.
+ * Mobile drawer + “⋯” menu (Bootstrap collapse + nested dropdowns).
+ * - Hamburger: left rail + backdrop (lms-nav-backdrop).
+ * - ⋯ panel: body.lms-more-open for z-index; outside click / Esc closes.
+ * - Opening ⋯ closes the sidebar; opening sidebar closes ⋯ collapse.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,8 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.querySelector('.lms-sidebar');
   const sidebarLinks = document.querySelectorAll('.lms-sidebar a');
   const mobileMore = document.getElementById('lmsMobileNavMore');
+  const moreToggleBtn = document.querySelector('[data-bs-target="#lmsMobileNavMore"]');
 
   if (!navbarToggler || !sidebar) return;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'lms-nav-backdrop';
+  backdrop.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(backdrop);
 
   function hideMobileMoreCollapse() {
     if (!mobileMore || typeof bootstrap === 'undefined') return;
@@ -18,53 +25,84 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inst) inst.hide();
   }
 
+  function isDrawerOpen() {
+    return sidebar.classList.contains('show');
+  }
+
+  function setDrawerOpen(open) {
+    sidebar.classList.toggle('show', open);
+    document.body.classList.toggle('lms-nav-open', open);
+    backdrop.classList.toggle('is-active', open);
+    navbarToggler.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
   if (mobileMore) {
     mobileMore.addEventListener('show.bs.collapse', () => {
-      sidebar.classList.remove('show');
+      setDrawerOpen(false);
+      document.body.classList.add('lms-more-open');
+    });
+    mobileMore.addEventListener('hidden.bs.collapse', () => {
+      document.body.classList.remove('lms-more-open');
     });
   }
 
-  /**
-   * Toggle sidebar visibility on hamburger click
-   */
   navbarToggler.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     hideMobileMoreCollapse();
-    sidebar.classList.toggle('show');
+    setDrawerOpen(!isDrawerOpen());
   });
 
-  /**
-   * Close sidebar when clicking on a navigation link
-   */
-  sidebarLinks.forEach(link => {
+  backdrop.addEventListener('click', () => {
+    setDrawerOpen(false);
+  });
+
+  sidebarLinks.forEach((link) => {
     link.addEventListener('click', () => {
-      sidebar.classList.remove('show');
+      setDrawerOpen(false);
     });
   });
 
-  /**
-   * Close sidebar when clicking outside of it
-   */
   document.addEventListener('click', (e) => {
     const isClickInsideSidebar = sidebar.contains(e.target);
     const isClickOnToggler = navbarToggler.contains(e.target);
+    const isClickOnBackdrop = backdrop.contains(e.target);
+    const isMoreToggle =
+      moreToggleBtn && (moreToggleBtn === e.target || moreToggleBtn.contains(e.target));
     const isClickOnMobileMore =
       mobileMore &&
-      (mobileMore.contains(e.target) ||
-        e.target.closest('[data-bs-toggle="collapse"][data-bs-target="#lmsMobileNavMore"]'));
+      (mobileMore.contains(e.target) || isMoreToggle);
 
-    if (!isClickInsideSidebar && !isClickOnToggler && !isClickOnMobileMore && sidebar.classList.contains('show')) {
-      sidebar.classList.remove('show');
+    if (
+      isDrawerOpen() &&
+      !isClickInsideSidebar &&
+      !isClickOnToggler &&
+      !isClickOnBackdrop &&
+      !isClickOnMobileMore
+    ) {
+      setDrawerOpen(false);
+    }
+
+    if (
+      document.body.classList.contains('lms-more-open') &&
+      mobileMore &&
+      !mobileMore.contains(e.target) &&
+      !isMoreToggle
+    ) {
+      hideMobileMoreCollapse();
     }
   });
 
-  /**
-   * Close sidebar on window resize to desktop view
-   */
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (isDrawerOpen()) setDrawerOpen(false);
+    if (document.body.classList.contains('lms-more-open')) hideMobileMoreCollapse();
+  });
+
   window.addEventListener('resize', () => {
     if (window.innerWidth > 991.98) {
-      sidebar.classList.remove('show');
+      setDrawerOpen(false);
+      hideMobileMoreCollapse();
     }
   });
 });

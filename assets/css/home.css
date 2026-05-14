@@ -2,6 +2,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 :root {
@@ -36,17 +37,49 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: clip;
+  overflow-x: visible;
   color: var(--lms-text);
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--lms-bg);
   background-image:
+    repeating-linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      transparent 1px 80px
+    ),
+    repeating-linear-gradient(
+      -12deg,
+      transparent,
+      transparent 140px,
+      rgba(15, 23, 42, 0.02) 140px,
+      rgba(15, 23, 42, 0.02) 141px
+    ),
+    radial-gradient(ellipse 100% 80% at 50% -20%, rgba(14, 165, 233, 0.09), transparent 55%),
     radial-gradient(900px 420px at 12% -10%, rgba(14, 165, 233, 0.14), transparent 55%),
     radial-gradient(700px 380px at 88% 0%, rgba(15, 118, 110, 0.12), transparent 50%),
     linear-gradient(180deg, var(--lms-bg) 0%, var(--lms-bg-accent) 100%);
   background-attachment: fixed;
+}
+
+/* Mobile / touch: fixed backgrounds break viewport-fixed chrome (e.g. iOS Safari) */
+@media (max-width: 991.98px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
+/* Pinned chrome: reinforce Bootstrap .fixed-top (mobile Safari + our media overrides) */
+nav.lms-topbar.navbar.fixed-top {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* —— Top bar —— */
@@ -75,6 +108,7 @@ body {
 /* Single-row bar on desktop (avoids extra height from wrap) */
 @media (min-width: 992px) {
   .lms-topbar .lms-topbar-inner {
+    display: flex !important;
     flex-wrap: nowrap;
     row-gap: 0;
     padding-top: 0.2rem;
@@ -144,6 +178,19 @@ body {
   padding: 0.75rem 0 0.85rem;
   background: var(--lms-surface-2);
   border-radius: 0 0 var(--lms-radius-sm) var(--lms-radius-sm);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: visible;
+}
+
+.lms-mobile-nav-drawer-inner .dropdown {
+  max-width: 100%;
+}
+
+.lms-mobile-nav-drawer .btn.dropdown-toggle {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lms-mobile-nav-drawer .dropdown-menu {
@@ -317,6 +364,7 @@ body {
 /* —— Sidebar —— */
 .lms-sidebar {
   width: var(--lms-sidebar-w);
+  max-width: min(var(--lms-sidebar-w), 88vw);
   top: var(--lms-topbar-stack);
   left: 0;
   height: calc(100dvh - var(--lms-topbar-stack));
@@ -325,6 +373,9 @@ body {
   background: linear-gradient(180deg, #3a4353 0%, #282c33 100%);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   overflow-y: auto;
+  overflow-x: clip;
+  box-sizing: border-box;
+  isolation: isolate;
 }
 
 .lms-sidebar .sidebar-label {
@@ -348,6 +399,8 @@ body {
   font-weight: 500;
   font-size: 0.92rem;
   transition: background 0.2s ease, color 0.2s ease;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .lms-sidebar a .nav-ico {
@@ -639,21 +692,221 @@ body {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2'%3e%3cline x1='3' y1='6' x2='21' y2='6'/%3e%3cline x1='3' y1='12' x2='21' y2='12'/%3e%3cline x1='3' y1='18' x2='21' y2='18'/%3e%3c/svg%3e") !important;
 }
 
+/* Backdrop for mobile drawer (created in mobile-menu.js) */
+.lms-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  /* Scrim only over page body (not under top bar) — lighter, like GitHub / Material nav */
+  .lms-nav-backdrop {
+    display: block;
+    position: fixed;
+    top: var(--lms-topbar-stack);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1040;
+    background: rgba(15, 23, 42, 0.22);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+  }
+
+  .lms-nav-backdrop.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .lms-nav-backdrop {
+    display: none !important;
+    pointer-events: none !important;
+  }
+}
+
+/* —— Desktop polish (lg+) —— shared by home, class, account_settings —— */
+@media (min-width: 992px) {
+  :root {
+    --lms-sidebar-w: 280px;
+  }
+
+  .lms-topbar {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.8) inset,
+      0 10px 40px rgba(15, 23, 42, 0.07);
+    border-bottom-color: rgba(15, 23, 42, 0.07);
+  }
+
+  .lms-main {
+    margin-left: calc(var(--lms-sidebar-w) + 20px);
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 3rem;
+    max-width: min(1280px, calc(100vw - var(--lms-sidebar-w) - 28px));
+  }
+
+  .lms-sidebar {
+    padding: 1.35rem 1.05rem calc(1.75rem + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(168deg, #3e4858 0%, #2d343d 44%, #222830 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset -1px 0 0 rgba(255, 255, 255, 0.05),
+      8px 0 44px rgba(0, 0, 0, 0.16);
+  }
+
+  .lms-sidebar a {
+    border-radius: 11px;
+  }
+
+  .lms-hero {
+    box-shadow:
+      var(--lms-shadow),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 24px 48px rgba(15, 23, 42, 0.12);
+  }
+
+  .lms-main .stat-box > .card {
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .lms-main .stat-box > .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(15, 23, 42, 0.11) !important;
+  }
+
+  .lms-main > h4.mb-3 {
+    font-size: 1.22rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--lms-text);
+    margin-bottom: 1.25rem !important;
+    position: relative;
+    padding-bottom: 0.55rem;
+  }
+
+  .lms-main > h4.mb-3::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 2.75rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--lms-brand), var(--lms-brand-2));
+  }
+
+  /* Home “My Classes” cards (Bootstrap markup: row g-4 + .card.shadow-sm) */
+  .lms-main .row.g-4 > [class*="col-"] > .card.shadow-sm {
+    border: 1px solid var(--lms-border) !important;
+    border-radius: var(--lms-radius) !important;
+    background: var(--lms-surface) !important;
+    box-shadow: var(--lms-shadow) !important;
+    overflow: hidden;
+    text-align: left;
+    padding: 1.35rem 1.25rem !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .lms-main .row.g-4 > [class*="col-"] > .card.shadow-sm::before {
+    content: "";
+    display: block;
+    height: 3px;
+    margin: -1.35rem -1.25rem 1rem;
+    background: linear-gradient(90deg, var(--lms-brand), var(--lms-brand-2));
+  }
+
+  .lms-main .row.g-4 > [class*="col-"] > .card.shadow-sm:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.22) !important;
+  }
+
+  .lms-main .row.g-4 .card h5 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.08rem;
+  }
+
+  .lms-main .row.g-4 .card > p {
+    color: var(--lms-muted);
+    font-size: 0.9rem;
+  }
+
+  .lms-main .row.g-4 .card .progress {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--lms-surface-2);
+    margin-bottom: 1rem;
+  }
+
+  .lms-main .row.g-4 .card .progress-bar {
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--lms-brand), var(--lms-brand-2));
+  }
+
+  .lms-main .row.g-4 .card .btn-primary.btn-sm {
+    border: none;
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.45rem 1.2rem;
+    background: linear-gradient(135deg, var(--lms-brand), var(--lms-brand-2));
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.24);
+  }
+
+  .modal-content {
+    border-radius: var(--lms-radius);
+    border: 1px solid var(--lms-border);
+    box-shadow: 0 28px 70px rgba(15, 23, 42, 0.2);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid var(--lms-border);
+    background: linear-gradient(180deg, var(--lms-surface-2) 0%, var(--lms-surface) 100%);
+  }
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --lms-sidebar-w: 288px;
+  }
+
+  .lms-main {
+    max-width: min(1320px, calc(100vw - var(--lms-sidebar-w) - 32px));
+  }
+}
+
 /* —— Responsive —— */
 @media (max-width: 991.98px) {
   :root {
-    --lms-sidebar-w: 250px;
+    /* Narrow rail + “peek” of content (Material / GitHub mobile pattern) */
+    --lms-sidebar-w: min(258px, calc(100vw - 56px));
     /* Brand row + one toolbar row (grid); slightly shorter than old 3-row wrap */
     --lms-topbar-h: 64px;
   }
 
-  /* Top bar above sidebar so dropdowns / expanded panels are usable */
+  /* Top bar above backdrop; sidebar sits between backdrop and topbar when open */
   .lms-topbar {
     z-index: 1050;
     background: var(--lms-surface);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06);
+  }
+
+  /* Single child is the inner wrapper — avoid flex “space-between” fighting the inner grid */
+  .lms-topbar.navbar {
+    display: block;
+    flex-wrap: unset;
+    overflow: visible;
   }
 
   .lms-main {
@@ -669,75 +922,195 @@ body {
   }
 
   .lms-sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
-    z-index: 1040;
+    width: var(--lms-sidebar-w);
+    max-width: none;
+    transform: translateX(calc(-100% - 12px));
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow:
+      4px 0 24px rgba(15, 23, 42, 0.12),
+      1px 0 0 rgba(255, 255, 255, 0.06) inset;
+    z-index: 1045;
+    border-radius: 0 14px 14px 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #2f3847 0%, #1e2329 100%);
   }
 
   .lms-sidebar.show {
     transform: translateX(0);
+    z-index: 1050;
+  }
+
+  /* Dim layer: JS toggles .lms-nav-backdrop + body.lms-nav-open */
+  body.lms-nav-open .lms-topbar .lms-topbar-inner > .lms-mobile-toolbar-search,
+  body.lms-nav-open .lms-topbar .lms-topbar-inner > .lms-mobile-nav-drawer {
+    display: none !important;
+  }
+
+  body.lms-nav-open {
+    overscroll-behavior: contain;
+  }
+
+  /* ⋯ sheet open: top bar stays visually separate from the floating menu */
+  body.lms-more-open .lms-topbar {
+    z-index: 1070;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
   }
 
   /*
-   * Mobile top bar: Bootstrap keeps .navbar > .container-fluid as flex, so search + buttons
-   * wrap and the hamburger drops to a third row on narrow phones (e.g. iPhone SE).
-   * Use a small grid: row1 = brand, row2 = search (minmax 0) | more | menu.
+   * Mobile top bar: two grid rows only (brand row + search). The ⋯ menu is
+   * position:absolute so it does not merge into one tall white block with the bar.
    */
-  .lms-topbar .lms-topbar-inner.container-fluid {
+  .lms-topbar .lms-topbar-inner {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    direction: ltr;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
     column-gap: 0.5rem;
-    row-gap: 0.4rem;
+    row-gap: 0.45rem;
     align-items: center;
     flex-wrap: unset !important;
     justify-content: unset;
+    position: relative;
+    overflow: visible;
+    padding-bottom: 0.15rem;
+  }
+
+  .lms-topbar .lms-topbar-inner > .lms-sidebar-toggler {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    justify-self: start;
+    margin-right: 0;
+    order: 0;
   }
 
   .lms-topbar .lms-topbar-inner > .navbar-brand {
-    grid-column: 1 / -1;
+    grid-column: 2;
     grid-row: 1;
     justify-self: start;
+    min-width: 0;
+    margin-left: 0 !important;
     margin-right: 0;
     padding-top: 0;
     padding-bottom: 0;
   }
 
+  .lms-topbar .lms-topbar-inner > .lms-mobile-more-btn {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+  }
+
   .lms-topbar .lms-topbar-inner > .lms-mobile-toolbar-search {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 2;
     min-width: 0;
     width: 100%;
-    max-width: none;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
     flex-grow: 0 !important;
   }
 
-  .lms-topbar .lms-topbar-inner > .lms-mobile-more-btn {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: center;
-    justify-self: center;
+  .lms-topbar .lms-mobile-toolbar-search .form-control {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
-  .lms-topbar .lms-topbar-inner > .lms-sidebar-toggler {
-    grid-column: 3;
-    grid-row: 2;
-    align-self: center;
-    justify-self: center;
-  }
-
+  /* Floating overflow menu — anchored under the bar, aligned to the ⋯ column */
   .lms-topbar .lms-topbar-inner > .lms-mobile-nav-drawer {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    width: 100% !important;
-    max-width: none;
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    right: max(0.15rem, env(safe-area-inset-right, 0px));
+    left: auto;
+    width: min(288px, calc(100vw - 1.25rem)) !important;
+    max-width: min(288px, calc(100vw - 1.25rem));
+    margin: 0;
+    box-sizing: border-box;
+    overflow: visible;
+    z-index: 1080;
+    border: 1px solid var(--lms-border);
+    border-radius: 14px;
+    background: var(--lms-surface);
+    box-shadow:
+      0 4px 6px rgba(15, 23, 42, 0.04),
+      0 18px 48px rgba(15, 23, 42, 0.14);
+  }
+
+  .lms-topbar .lms-mobile-nav-drawer:not(.show) {
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  .lms-topbar .lms-mobile-nav-drawer-inner {
+    padding: 0.45rem 0.5rem 0.55rem;
+    background: var(--lms-surface);
+    border-radius: 13px;
+    max-height: min(72vh, 400px);
+    overflow-x: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .lms-mobile-nav-drawer .dropdown {
+    position: relative;
+    margin: 0;
+  }
+
+  .lms-mobile-nav-drawer .btn.dropdown-toggle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 0.65rem;
+    border-radius: 10px;
+    border: 1px solid var(--lms-border);
+    background: var(--lms-surface-2);
+    box-shadow: none;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .lms-mobile-nav-drawer .btn.dropdown-toggle:hover,
+  .lms-mobile-nav-drawer .btn.dropdown-toggle:focus {
+    background: var(--lms-surface-2);
+    filter: brightness(0.96);
+    border-color: var(--lms-muted);
+  }
+
+  /* In-flow submenus (static); tighter spacing */
+  .lms-mobile-nav-drawer .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    inset: auto !important;
+    float: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+    border-radius: 10px;
+    border: 1px solid var(--lms-border);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .lms-mobile-nav-drawer .dropdown-menu.show {
+    display: block;
   }
 }
 
 @media (max-width: 576px) {
   :root {
-    --lms-sidebar-w: 280px;
+    --lms-sidebar-w: min(244px, calc(100vw - 48px));
   }
 
   body {
@@ -813,19 +1186,22 @@ body {
   }
 }
 
-/* Add overlay backdrop for mobile when sidebar is open */
-@media (max-width: 991.98px) {
-  .lms-sidebar.show::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    pointer-events: none;
-    z-index: -1;
-  }
+/* Large soft orbs — fixed, non-interactive (fills viewport with depth) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(14, 165, 233, 0.07), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(15, 118, 110, 0.06), transparent 55%),
+    radial-gradient(circle min(38vmax, 420px) at 85% 75%, rgba(14, 165, 233, 0.045), transparent 72%);
+}
+
+.lms-main {
+  position: relative;
+  z-index: 1;
 }
 .error, .unavailable{
     color:red;

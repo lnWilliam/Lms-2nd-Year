@@ -1,0 +1,146 @@
+/*
+ * certificates.css — Certificates route (assets/pages/certificates.php)
+ *
+ * Wire-up: link this file and use on <main>:
+ *   <main class="main lms-main lms-page--certificates"> … </main>
+ *
+ * Sample structure:
+ *   <section class="lms-sub-hero">…</section>
+ *   <div class="row g-3"><div class="col-…"><article class="lms-sub-cert">…</article></div></div>
+ */
+
+main.lms-main.lms-page--certificates .lms-sub-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: calc(var(--lms-radius) + 6px);
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.25rem);
+  margin-bottom: 1.75rem;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--lms-shadow), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  background:
+    radial-gradient(ellipse 75% 60% at 50% -10%, rgba(250, 204, 21, 0.22), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 100% 80%, rgba(14, 165, 233, 0.25), transparent 50%),
+    linear-gradient(128deg, #0f766e 0%, #115e59 35%, #155e75 70%, #0e7490 100%);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-eyebrow,
+main.lms-main.lms-page--certificates .lms-sub-title,
+main.lms-main.lms-page--certificates .lms-sub-lead {
+  position: relative;
+  z-index: 1;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.75);
+  margin-bottom: 0.35rem;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-lead {
+  margin: 0;
+  max-width: 40rem;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert {
+  height: 100%;
+  border-radius: var(--lms-radius);
+  border: 1px solid var(--lms-border);
+  background: linear-gradient(165deg, var(--lms-surface) 0%, var(--lms-surface-2) 100%);
+  box-shadow: var(--lms-shadow);
+  padding: 1.35rem 1.2rem 1.25rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ca8a04, var(--lms-brand-2), var(--lms-brand));
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert--muted {
+  opacity: 0.72;
+  filter: saturate(0.85);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert--muted:hover {
+  transform: translateY(-2px);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert-seal {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  color: #fff;
+  background: linear-gradient(135deg, #ca8a04, #eab308);
+  box-shadow: 0 8px 22px rgba(202, 138, 4, 0.35);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert--muted .lms-sub-cert-seal {
+  background: linear-gradient(135deg, var(--lms-muted), #94a3b8);
+  box-shadow: none;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: var(--lms-text);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-cert-meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--lms-muted);
+}
+
+main.lms-main.lms-page--certificates .lms-sub-footnote {
+  font-size: 0.82rem;
+  color: var(--lms-muted);
+  margin-top: 1.25rem;
+}
+
+main.lms-main.lms-page--certificates .lms-sub-footnote code {
+  font-size: 0.78em;
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--lms-surface-2);
+  border: 1px solid var(--lms-border);
+}
+
+@media (min-width: 992px) {
+  main.lms-main.lms-page--certificates .lms-sub-cert {
+    padding: 1.5rem 1.35rem 1.35rem;
+  }
+}

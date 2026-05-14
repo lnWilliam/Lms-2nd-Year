@@ -1,0 +1,145 @@
+/*
+ * assignments.css — Assignments route (assets/pages/assignments.php)
+ *
+ * Wire-up: link this file and use on <main>:
+ *   <main class="main lms-main lms-page--assignments"> … </main>
+ *
+ * Sample structure:
+ *   <section class="lms-sub-hero">…</section>
+ *   <ul class="lms-sub-list">…<li class="lms-sub-list-item">…</li></ul>
+ */
+
+main.lms-main.lms-page--assignments .lms-sub-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: calc(var(--lms-radius) + 6px);
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.25rem);
+  margin-bottom: 1.75rem;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--lms-shadow), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  background:
+    radial-gradient(ellipse 70% 55% at 0% 0%, rgba(14, 165, 233, 0.38), transparent 55%),
+    radial-gradient(ellipse 65% 50% at 100% 100%, rgba(15, 118, 110, 0.42), transparent 52%),
+    linear-gradient(118deg, #0f766e 0%, #0d9488 40%, #0e7490 100%);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-eyebrow,
+main.lms-main.lms-page--assignments .lms-sub-title,
+main.lms-main.lms-page--assignments .lms-sub-lead {
+  position: relative;
+  z-index: 1;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.72);
+  margin-bottom: 0.35rem;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-lead {
+  margin: 0;
+  max-width: 40rem;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border-radius: var(--lms-radius);
+  border: 1px solid var(--lms-border);
+  background: var(--lms-surface);
+  box-shadow: var(--lms-shadow);
+  overflow: hidden;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--lms-border);
+  transition: background 0.18s ease;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-item:last-child {
+  border-bottom: none;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-item:hover {
+  background: var(--lms-surface-2);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-meta {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--lms-muted);
+  min-width: 5.5rem;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-title {
+  flex: 1 1 12rem;
+  font-weight: 600;
+  color: var(--lms-text);
+  font-size: 0.95rem;
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-badge {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0369a1;
+  border: 1px solid rgba(14, 165, 233, 0.28);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-badge--muted {
+  background: var(--lms-surface-2);
+  color: var(--lms-muted);
+  border-color: var(--lms-border);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-list-badge--done {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-footnote {
+  font-size: 0.82rem;
+  color: var(--lms-muted);
+}
+
+main.lms-main.lms-page--assignments .lms-sub-footnote code {
+  font-size: 0.78em;
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--lms-surface-2);
+  border: 1px solid var(--lms-border);
+}
+
+@media (min-width: 992px) {
+  main.lms-main.lms-page--assignments .lms-sub-list-item {
+    padding: 1.1rem 1.35rem;
+  }
+}
