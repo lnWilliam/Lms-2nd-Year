@@ -75,7 +75,31 @@ class ClassModel
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function getStudents($class_id){
+        try {
+            $this->conn->beginTransaction();
 
+            $sql = "SELECT u.first_name,u.last_name, cu.role as Students
+                FROM USERS u 
+                JOIN class_user cu on cu.user_id = u.user_id
+                JOIN classes c on c.class_id = cu.class_id
+                WHere c.class_id = :class_id
+            ";
+
+            $statement= $this->conn->prepare($sql);
+            $statement->execute([':class_id' => $class_id]);
+
+            $this->conn->commit();
+
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (\PDOException $e) {
+            $this->conn->rollBack();
+            error_log("Join class error: " . $e->getMessage());
+            return ["success" => false, "message" => "Something went wrong"];
+        }
+
+    }
     public function joinClassByCode($user_id, $class_code)
     {
         try {

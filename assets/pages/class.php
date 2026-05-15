@@ -40,6 +40,7 @@ foreach ($classes as $c) {
         break;
     }
 }
+$students = $classModel->getStudents($class_id);
 
 if (!$currentClass) {
     die("Unauthorized access.");
@@ -89,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
     header("Location: class.php?class_id=" . $class_id);
     exit();
 }
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
 
@@ -215,7 +218,19 @@ if (isset($_GET['delete_post'])) {
 
             <p><?php echo htmlspecialchars($currentClass['class_desc']); ?></p>
         </div>
-
+        <div class='row shadow p-3 mb-3 bg-body-tertiary rounded mx-0'>
+            <ul class="nav gap-5" >
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Stream</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Classwork</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id='getStudents'>Student</a>
+                </li>
+            </ul>
+        </div>
         <div class="row">
 
             <!-- LEFT PANEL -->
@@ -371,7 +386,7 @@ if (isset($_GET['delete_post'])) {
                                     <?php endforeach; ?>
 
                                 </ul>
-                                
+
                             </div>
 
 
@@ -383,7 +398,7 @@ if (isset($_GET['delete_post'])) {
                                 🗑 Delete
                             </a>
                         <?php endif; ?>
-                       
+
                     </div>
 
                 <?php endforeach; ?>
@@ -391,7 +406,7 @@ if (isset($_GET['delete_post'])) {
             </div>
 
         </div>
-    
+
     </main>
 
     <!-- Announcement modal (body-level so backdrop and dialog stack correctly) -->
