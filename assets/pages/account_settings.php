@@ -16,60 +16,62 @@ $user = $_SESSION['user_data'];
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>LMS Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/account_settings.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <style>
-        .sidebar a.active {
-            background-color: grey;
-            color: white;
-        }
-
-        .dropdown-menu li:nth-child(2) a {
-            background-color: grey;
-        }
-
-        .dropdown-menu li:nth-child(2) a:hover {
-            background-color: grey;
-            color: black;
-        }
-        .info{
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light lms-topbar fixed-top px-3">
-        <div class="container-fluid gap-2">
-            <a class="navbar-brand d-flex align-items-center" href="home.php">
+        <div class="container-fluid gap-2 align-items-center lms-topbar-inner">
+            <button class="navbar-toggler d-lg-none lms-sidebar-toggler flex-shrink-0" type="button" aria-controls="Primary navigation" aria-expanded="false" aria-label="Open side navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand d-flex align-items-center flex-shrink-0" href="home.php">
                 <span class="brand-mark" aria-hidden="true">◆</span>
                 MyLMS
             </a>
-            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#lmsTopNav" aria-controls="lmsTopNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="lmsTopNav">
-                <form class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center ms-lg-auto gap-2 my-2 my-lg-0 lms-search" role="search">
-                    <button type="button" class="btn btn-lms-ghost">+ Class</button>
-                    <input class="form-control" type="search" placeholder="Search courses…" aria-label="Search courses">
+
+            <form class="lms-mobile-toolbar-search d-flex d-lg-none flex-grow-1 min-w-0" role="search" action="#" method="get">
+                <label class="visually-hidden" for="lmsMobileSearchAccount">Search courses</label>
+                <input id="lmsMobileSearchAccount" class="form-control" type="search" name="q" placeholder="Search courses…" aria-label="Search courses" autocomplete="off">
+                <button class="btn btn-lms-primary lms-search-submit-btn" type="submit" aria-label="Search">⌕</button>
+            </form>
+
+            <button class="btn btn-lms-ghost d-lg-none flex-shrink-0 px-2 lms-mobile-more-btn" type="button" data-bs-toggle="collapse" data-bs-target="#lmsMobileNavMore" aria-controls="lmsMobileNavMore" aria-expanded="false" aria-label="Account menu">⋯</button>
+
+            <div class="collapse lms-mobile-nav-drawer d-lg-none w-100" id="lmsMobileNavMore">
+                <div class="lms-mobile-nav-drawer-inner d-flex flex-column gap-2">
+                    <a class="btn btn-lms-ghost w-100 text-start" href="home.php">+ Class</a>
+                    <div class="dropdown">
+                        <a class="btn dropdown-toggle w-100 text-start" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="true" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
+                        <ul class="dropdown-menu dropdown-menu-end w-100">
+                            <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Preferences</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-none d-lg-flex align-items-center ms-lg-auto gap-2 flex-nowrap">
+                <form class="d-flex align-items-center gap-2 lms-search" role="search" action="#" method="get">
+                    <a class="btn btn-lms-ghost" href="home.php">+ Class</a>
+                    <input class="form-control" type="search" name="q" placeholder="Search courses…" aria-label="Search courses">
                     <button class="btn btn-lms-primary" type="submit">Search</button>
                 </form>
-                <div class="dropdown ms-lg-3">
-                    <a class="btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">👤<?php echo $user['first_name'] ?? ''; ?></a>
+                <div class="dropdown">
+                    <a class="btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
                     <ul class="dropdown-menu dropdown-menu-end">
-
-                        <li><a class="dropdown-item" href="./assets/pages/account_settings.php">Profile</a></li>
+                        <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
                         <li><a class="dropdown-item" href="#">Preferences</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
                     </ul>
                 </div>
@@ -83,7 +85,7 @@ $user = $_SESSION['user_data'];
         <a href="#"><span class="nav-ico" aria-hidden="true">▤</span> Terms and Condition</a>
         <a href="home.php"><span class="nav-ico" aria-hidden="true">◎</span> Home</a>
         <p class="sidebar-label" style="margin-top:1rem">Account</p>
-        <a href="#"><span class="nav-ico" aria-hidden="true">⚙</span> Settings and Privacy</a>
+        <a href="settings.php"><span class="nav-ico" aria-hidden="true">⚙</span> Settings and Privacy</a>
     </aside>
 
     <!-- MAIN -->
@@ -162,6 +164,7 @@ $user = $_SESSION['user_data'];
             });
         }
     </script>
+    <script src='../js/mobile-menu.js'></script>
 
 </body>
 

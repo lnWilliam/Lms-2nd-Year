@@ -252,20 +252,339 @@ button:hover{
 }
 
 
-/* Mobile: allow scroll + safe areas (viewport-fit=cover in login.php) */
-@media (max-width: 960px) {
+/* Responsive Design */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+    .container {
+        width: 900px;
+        height: 600px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .container {
+        width: 850px;
+        height: 580px;
+    }
+}
+
+/* Tablets Landscape */
+@media (min-width: 768px) and (max-width: 991px) {
+    body {
+        align-items: center;
+        padding: 1rem;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 700px;
+        height: 550px;
+        margin: 0 auto;
+    }
+    
+    .panel {
+        padding: 35px;
+    }
+    
+    .midPanel h1 {
+        font-size: 2rem;
+    }
+    
+    .social i {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+/* Tablets Portrait */
+@media (min-width: 600px) and (max-width: 767px) {
     body {
         overflow-y: auto;
         overflow-x: hidden;
         align-items: flex-start;
-        padding: max(0.75rem, env(safe-area-inset-top, 0px))
-            max(0.75rem, env(safe-area-inset-right, 0px))
-            max(0.75rem, env(safe-area-inset-bottom, 0px))
-            max(0.75rem, env(safe-area-inset-left, 0px));
+        padding: 1rem 0.5rem;
     }
-
+    
     .container {
-        width: min(100% - 1.5rem, 900px);
-        margin: 0.5rem auto;
+        width: 100%;
+        height: auto;
+        min-height: 500px;
+        margin: 0 auto;
+        border-radius: 16px;
+        max-width: 600px;
     }
+    
+    .panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 30px 25px;
+        transform: none !important;
+    }
+    
+    .leftPanel {
+        order: 1;
+    }
+    
+    .midPanel {
+        order: 0;
+        background: rgba(255,255,255,0.1);
+        padding: 35px 25px;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .rightPanel {
+        order: 2;
+        display: none;
+    }
+    
+    #toggle:checked ~ .leftPanel { 
+        transform: none !important; 
+        display: none;
+    }
+    
+    #toggle:checked ~ .midPanel { 
+        transform: none !important;
+        display: none;
+    }
+    
+    #toggle:checked ~ .rightPanel { 
+        transform: none !important;
+        display: block;
+        order: 1;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.8rem;
+    }
+    
+    .midPanel p {
+        font-size: 0.9rem;
+    }
+    
+    .social i {
+        width: 36px;
+        height: 36px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    
+    input {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    button {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .switch {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+    body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        align-items: flex-start;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .container {
+        width: 100%;
+        height: auto;
+        min-height: 480px;
+        margin: 0;
+        border-radius: 16px;
+    }
+    
+    .panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 25px 20px;
+        transform: none !important;
+    }
+    
+    .leftPanel {
+        order: 1;
+    }
+    
+    .midPanel {
+        order: 0;
+        background: rgba(255,255,255,0.1);
+        padding: 30px 20px;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .rightPanel {
+        order: 2;
+        display: none;
+    }
+    
+    #toggle:checked ~ .leftPanel { 
+        transform: none !important; 
+        display: none;
+    }
+    
+    #toggle:checked ~ .midPanel { 
+        transform: none !important;
+        display: none;
+    }
+    
+    #toggle:checked ~ .rightPanel { 
+        transform: none !important;
+        display: block;
+        order: 1;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.6rem;
+    }
+    
+    .midPanel p {
+        font-size: 0.9rem;
+    }
+    
+    .social i {
+        width: 34px;
+        height: 34px;
+    }
+    
+    h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+    
+    input {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    button {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .switch {
+        font-size: 0.9rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .container {
+        border-radius: 12px;
+        min-height: 450px;
+    }
+    
+    .panel {
+        padding: 20px 15px;
+    }
+    
+    .midPanel {
+        padding: 25px 15px;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    .social {
+        gap: 10px;
+    }
+    
+    .social i {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    form {
+        gap: 12px;
+    }
+    
+    .input-box input {
+        padding: 12px 10px;
+        font-size: 16px;
+    }
+    
+    .input-box label {
+        left: 10px;
+        font-size: 13px;
+    }
+    
+    .input-box input:focus + label,
+    .input-box input:valid + label {
+        top: -10px;
+        font-size: 11px;
+    }
+}
+
+/* Ultra Small Mobile */
+@media (max-width: 360px) {
+    body {
+        padding: 0.25rem;
+    }
+    
+    .container {
+        border-radius: 8px;
+        min-height: 420px;
+    }
+    
+    .panel {
+        padding: 15px 12px;
+    }
+    
+    .midPanel {
+        padding: 20px 12px;
+    }
+    
+    .midPanel h1 {
+        font-size: 1.3rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .social i {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+
+/* Subtle full-screen mesh behind login (non-interactive) */
+html::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08), transparent 42%),
+        radial-gradient(circle at 85% 70%, rgba(255, 255, 255, 0.06), transparent 48%),
+        repeating-linear-gradient(
+            125deg,
+            rgba(255, 255, 255, 0.03) 0 1px,
+            transparent 1px 56px
+        );
+    opacity: 0.9;
 }
