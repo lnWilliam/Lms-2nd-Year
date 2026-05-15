@@ -75,30 +75,54 @@ class ClassModel
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getStudents($class_id){
+    public function getStudents($class_id)
+    {
         try {
-            $this->conn->beginTransaction();
+            $sql = "SELECT
+                    u.user_id,
+                    u.first_name,
+                    u.last_name,
+                    a.email,
+                    cu.role
+                FROM Users u
+                JOIN Class_User cu ON cu.user_id = u.user_id
+                JOIN Account a ON a.account_id = u.account_id
+                WHERE cu.class_id = :class_id
+                AND cu.role = 'student'
+                ORDER BY u.last_name ASC, u.first_name ASC";
 
-            $sql = "SELECT u.first_name,u.last_name, cu.role as Students
-                FROM USERS u 
-                JOIN class_user cu on cu.user_id = u.user_id
-                JOIN classes c on c.class_id = cu.class_id
-                WHere c.class_id = :class_id
-            ";
-
-            $statement= $this->conn->prepare($sql);
-            $statement->execute([':class_id' => $class_id]);
-
-            $this->conn->commit();
+            $statement = $this->conn->prepare($sql);
+            $statement->execute([
+                ':class_id' => $class_id
+            ]);
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (\PDOException $e) {
-            $this->conn->rollBack();
-            error_log("Join class error: " . $e->getMessage());
-            return ["success" => false, "message" => "Something went wrong"];
+            error_log("Get students error: " . $e->getMessage());
+            return [];
         }
+    }
 
+    public function removeStudentFromClass($class_id, $student_id)
+    {
+        try {
+            $sql = "DELETE FROM Class_User
+                    WHERE class_id = :class_id
+                    AND user_id = :user_id
+                    AND role = 'student'";
+
+            $statement = $this->conn->prepare($sql);
+
+            return $statement->execute([
+                ':class_id' => $class_id,
+                ':user_id' => $student_id
+            ]);
+
+        } catch (\PDOException $e) {
+            error_log("Remove student error: " . $e->getMessage());
+            return false;
+        }
     }
     public function joinClassByCode($user_id, $class_code)
     {
@@ -335,7 +359,24 @@ class ClassModel
             return false;
         }
     }
+    public function getTeacher($class_id)
+    {
+        $sql = "SELECT
+            u.first_name,
+            u.last_name,
+            a.email
+        FROM Class_User cu
+        JOIN Users u ON cu.user_id = u.user_id
+        JOIN Account a ON a.account_id = u.account_id
+        WHERE cu.class_id = ?
+        AND cu.role = 'teacher'
+        LIMIT 1";
 
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$class_id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
     public function getClassPosts($class_id)
     {
         try {

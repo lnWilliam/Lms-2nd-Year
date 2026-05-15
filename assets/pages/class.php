@@ -54,6 +54,18 @@ if (empty($currentClass['class_desc'])) {
     $currentClass['class_desc'] = "No description";
 }
 
+// 🧑‍🎓 Remove student from class
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_student_id'])) {
+
+    if ($isTeacher) {
+        $student_id = (int) $_POST['remove_student_id'];
+        $classModel->removeStudentFromClass($class_id, $student_id);
+    }
+
+    header("Location: class.php?class_id=" . $class_id);
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement'])) {
 
     $title = $_POST['title'] ?? '';
@@ -261,15 +273,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
             <p><?php echo htmlspecialchars($currentClass['class_desc']); ?></p>
         </div>
         <div class='row shadow p-3 mb-3 bg-body-tertiary rounded mx-0'>
-            <ul class="nav gap-5" >
+            <ul class="nav gap-5">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Stream</a>
+                    <button class="nav-link active border-0 bg-transparent" type="button" id="streamBtn">
+                        Stream
+                    </button>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Classwork</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id='getStudents'>Student</a>
+                    <button class="nav-link border-0 bg-transparent" type="button" id="getStudents">
+                        Student
+                    </button>
                 </li>
             </ul>
         </div>
@@ -282,14 +298,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 <?php if ($isTeacher): ?>
                     <div class="card p-3 mb-3 teacher-panel">
                         <h5>⚙️ Teacher Panel</h5>
-
-                        <a href="add_material.php?class_id=<?php echo $class_id; ?>" class="btn btn-light btn-sm mb-2">
-                            ➕ Add Material
-                        </a>
-
-                        <a href="manage_students.php?class_id=<?php echo $class_id; ?>" class="btn btn-light btn-sm mb-2">
-                            👥 Manage Students
-                        </a>
 
                         <a href="edit_class.php?class_id=<?php echo $class_id; ?>" class="btn btn-light btn-sm mb-2">
                             ✏️ Edit Class
@@ -318,6 +326,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
             <!-- RIGHT PANEL -->
             <div class="col-md-9">
+
+                <!-- STREAM SECTION -->
+                <div id="streamSection">
 
                 <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">✏️ New Announcement</button>
                 <?php if ($isTeacher): ?>
@@ -438,9 +449,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         <?php endif; ?>
 
                     </div>
-                    </a>        
+                    </a>
                 <?php endforeach; ?>
+
+                </div>
+                <!-- STUDENT SECTION -->
+                <div id="studentSection" style="display:none;">
+                    <div class="card p-3 shadow-sm mb-3 flex-column flex-md-row align-items-md-center gap-3">
+                            <strong>
+                                <?php
+                                $teacher = $classModel->getTeacher($class_id);
+                                echo htmlspecialchars(ucfirst($teacher['first_name'] ?? '')) . ' ' . htmlspecialchars(ucfirst($teacher['last_name'] ?? ''));
+                                ?>
+                            </strong>
+
+                            <span class="badge bg-success">
+                                Teacher
+                            </span>
+
+                    </div>        
+                    <div class="card p-3 shadow-sm">
                         
+                        <h4 class="mb-4">Students</h4>
+
+                        <?php if (count($students) > 0): ?>
+
+                            <?php foreach ($students as $student): ?>
+
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+                                    <div>
+                                        <strong>
+                                            <?= htmlspecialchars($student['first_name'] ?? '') ?>
+                                            <?= htmlspecialchars($student['last_name'] ?? '') ?>
+                                        </strong>
+
+                                        <?php if (!empty($student['email'])): ?>
+                                            <div class="text-muted small">
+                                                <?= htmlspecialchars($student['email']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <?php if ($isTeacher): ?>
+                                        <form method="POST"
+                                            onsubmit="return confirm('Remove this student from the class?');">
+
+                                            <input type="hidden"
+                                                name="remove_student_id"
+                                                value="<?= htmlspecialchars($student['user_id'] ?? '') ?>">
+
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Remove
+                                            </button>
+
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">
+                                            Student
+                                        </span>
+                                    <?php endif; ?>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+
+                            <p class="mb-0">No students found.</p>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
@@ -537,6 +620,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
     <script src='../js/animate.js'></script>
     <script src='../js/mobile-menu.js'></script>
     <script src='../js/assignment.js'></script>
+
+    <script>
+        const streamBtn = document.getElementById('streamBtn');
+        const studentBtn = document.getElementById('getStudents');
+
+        const streamSection = document.getElementById('streamSection');
+        const studentSection = document.getElementById('studentSection');
+
+        streamBtn.addEventListener('click', function () {
+            streamSection.style.display = 'block';
+            studentSection.style.display = 'none';
+
+            streamBtn.classList.add('active');
+            studentBtn.classList.remove('active');
+        });
+
+        studentBtn.addEventListener('click', function () {
+            streamSection.style.display = 'none';
+            studentSection.style.display = 'block';
+
+            studentBtn.classList.add('active');
+            streamBtn.classList.remove('active');
+        });
+    </script>
 </body>
 
 </html>
