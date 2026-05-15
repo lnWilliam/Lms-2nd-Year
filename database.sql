@@ -113,6 +113,18 @@ CREATE TABLE Attachment (
     FOREIGN KEY (post_id) REFERENCES Post(post_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Submission_Attachment (
+    submission_attachment_id INT AUTO_INCREMENT PRIMARY KEY,
+    submission_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (submission_id) REFERENCES Submission(submission_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
 ALTER TABLE Class_User
 ADD UNIQUE (class_id, user_id);
 

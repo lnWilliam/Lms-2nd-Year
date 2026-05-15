@@ -97,7 +97,6 @@ class ClassModel
             ]);
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);
-
         } catch (\PDOException $e) {
             error_log("Get students error: " . $e->getMessage());
             return [];
@@ -118,7 +117,6 @@ class ClassModel
                 ':class_id' => $class_id,
                 ':user_id' => $student_id
             ]);
-
         } catch (\PDOException $e) {
             error_log("Remove student error: " . $e->getMessage());
             return false;
@@ -486,5 +484,293 @@ class ClassModel
         $stmt->execute([$post_id]);
 
         return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+    public function getAssignmentByPostId($post_id)
+    {
+        try {
+            $sql = "SELECT
+                    p.post_id,
+                    p.class_id,
+                    p.postedBy,
+                    p.title,
+                    p.description,
+                    p.due_date,
+                    p.created_at,
+                    act.activity_id,
+                    act.max_score,
+                    act.allow_late
+                FROM Post p
+                JOIN Activity act ON act.post_id = p.post_id
+                WHERE p.post_id = ?
+                AND p.type = 'assignment'
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$post_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log('Get assignment error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getPostAttachments($post_id)
+    {
+        try {
+            $sql = "SELECT attachment_id, attachment_type, file_name, file_path
+                FROM Attachment
+                WHERE post_id = ?
+                ORDER BY attachment_id ASC";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$post_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log('Get attachments error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAssignmentGrades($class_id, $activity_id)
+    {
+        try {
+            $sql = "SELECT
+                    cu.class_user_id,
+                    u.user_id,
+                    u.first_name,
+                    u.last_name,
+                    a.email,
+                    s.submission_id,
+                    s.grade,
+                    s.submitted_at,
+                    COUNT(sa.submission_attachment_id) AS submitted_file_count
+                FROM Class_User cu
+                JOIN Users u ON u.user_id = cu.user_id
+                JOIN Account a ON a.account_id = u.account_id
+                LEFT JOIN Submission s
+                    ON s.class_user_id = cu.class_user_id
+                    AND s.activity_id = :activity_id
+                LEFT JOIN Submission_Attachment sa
+                    ON sa.submission_id = s.submission_id
+                WHERE cu.class_id = :class_id
+                AND cu.role = 'student'
+                GROUP BY cu.class_user_id, u.user_id, u.first_name, u.last_name, a.email, s.submission_id, s.grade, s.submitted_at
+                ORDER BY u.last_name ASC, u.first_name ASC";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':class_id' => $class_id,
+                ':activity_id' => $activity_id
+            ]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log('Get assignment grades error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function saveStudentGrade($class_id, $student_id, $activity_id, $grade)
+    {
+        try {
+            $sql = "SELECT class_user_id
+                FROM Class_User
+                WHERE class_id = ?
+                AND user_id = ?
+                AND role = 'student'
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$class_id, $student_id]);
+            $classUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$classUser) {
+                return false;
+            }
+
+            $sql = "INSERT INTO Submission (class_user_id, activity_id, grade)
+                VALUES (:class_user_id, :activity_id, :grade)
+                ON DUPLICATE KEY UPDATE
+                    grade = VALUES(grade)";
+
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                ':class_user_id' => $classUser['class_user_id'],
+                ':activity_id' => $activity_id,
+                ':grade' => $grade
+            ]);
+        } catch (\PDOException $e) {
+            error_log('Save grade error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getStudentSubmission($class_id, $student_id, $activity_id)
+    {
+        try {
+            $sql = "SELECT
+                    s.submission_id,
+                    s.grade,
+                    s.submitted_at,
+                    cu.class_user_id
+                FROM Class_User cu
+                LEFT JOIN Submission s
+                    ON s.class_user_id = cu.class_user_id
+                    AND s.activity_id = :activity_id
+                WHERE cu.class_id = :class_id
+                AND cu.user_id = :student_id
+                AND cu.role = 'student'
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':class_id' => $class_id,
+                ':student_id' => $student_id,
+                ':activity_id' => $activity_id
+            ]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log('Get student submission error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function submitAssignmentFiles($class_id, $student_id, $activity_id, $files)
+    {
+        try {
+            $sql = "SELECT class_user_id
+                FROM Class_User
+                WHERE class_id = ?
+                AND user_id = ?
+                AND role = 'student'
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$class_id, $student_id]);
+            $classUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$classUser) {
+                return ['success' => false, 'message' => 'Student is not part of this class.'];
+            }
+
+            if (empty($files['name'][0])) {
+                return ['success' => false, 'message' => 'Please choose at least one file.'];
+            }
+
+            $this->conn->beginTransaction();
+
+            $sql = "INSERT INTO Submission (class_user_id, activity_id, submitted_at)
+                VALUES (:class_user_id, :activity_id, CURRENT_TIMESTAMP)
+                ON DUPLICATE KEY UPDATE submitted_at = CURRENT_TIMESTAMP";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':class_user_id' => $classUser['class_user_id'],
+                ':activity_id' => $activity_id
+            ]);
+
+            $sql = "SELECT submission_id
+                FROM Submission
+                WHERE class_user_id = ?
+                AND activity_id = ?
+                LIMIT 1";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$classUser['class_user_id'], $activity_id]);
+            $submission = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$submission) {
+                $this->conn->rollBack();
+                return ['success' => false, 'message' => 'Unable to create submission.'];
+            }
+
+            $submission_id = $submission['submission_id'];
+            $uploadDir = 'documents/submissions/';
+            $publicDir = 'documents/submissions/';
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
+
+            $allowedExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'zip', 'rar', 'txt'];
+            $uploadedCount = 0;
+
+            foreach ($files['name'] as $i => $fileName) {
+                if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                    continue;
+                }
+
+                $tmp = $files['tmp_name'][$i];
+                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                if (!in_array($ext, $allowedExts, true)) {
+                    continue;
+                }
+
+                $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($fileName));
+                $newFileName = $submission_id . '_' . time() . '_' . uniqid() . '_' . $safeName;
+                $targetPath = $uploadDir . $newFileName;
+                $dbPath = $publicDir . $newFileName;
+
+                if (move_uploaded_file($tmp, $targetPath)) {
+                    $sql = "INSERT INTO Submission_Attachment (submission_id, file_name, file_path, file_type)
+                        VALUES (?, ?, ?, ?)";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$submission_id, $fileName, $dbPath, $ext]);
+                    $uploadedCount++;
+                }
+            }
+
+            if ($uploadedCount === 0) {
+                $this->conn->rollBack();
+                return ['success' => false, 'message' => 'No valid files were uploaded.'];
+            }
+
+            $this->conn->commit();
+            return ['success' => true, 'message' => 'Assignment turned in successfully.'];
+        } catch (\PDOException $e) {
+            if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+            }
+            error_log('Submit assignment error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Unable to submit assignment.'];
+        }
+    }
+
+    public function getSubmissionFiles($submission_id)
+    {
+        try {
+            if (!$submission_id) {
+                return [];
+            }
+
+            $sql = "SELECT submission_attachment_id, file_name, file_path, file_type, uploaded_at
+                FROM Submission_Attachment
+                WHERE submission_id = ?
+                ORDER BY uploaded_at DESC";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$submission_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log('Get submission files error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getSubmissionFilesByStudent($class_id, $student_id, $activity_id)
+    {
+        try {
+            $submission = $this->getStudentSubmission($class_id, $student_id, $activity_id);
+
+            if (!$submission || empty($submission['submission_id'])) {
+                return [];
+            }
+
+            return $this->getSubmissionFiles($submission['submission_id']);
+        } catch (\PDOException $e) {
+            error_log('Get submission files by student error: ' . $e->getMessage());
+            return [];
+        }
     }
 }
