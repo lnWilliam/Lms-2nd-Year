@@ -279,125 +279,11 @@ if (isset($_GET['delete_post'])) {
 
 
 
-                <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#announcement">
+                <?php if ($isTeacher): ?>
+                <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">
                     ✏️ New Announcement</button>
+                <?php endif; ?>
 
-                <!-- Announcement Modal -->
-                <form method="POST"
-                    enctype="multipart/form-data"
-                    class="upload-form">
-
-                    <div class="modal fade"
-                        id="announcement"
-                        tabindex="-1">
-
-                        <div class="modal-dialog modal-lg">
-
-                            <div class="modal-content">
-
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5">
-                                        New Announcement
-                                    </h1>
-
-                                    <button type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal">
-                                    </button>
-                                </div>
-
-                                <div class="modal-body">
-
-                                    <!-- TITLE -->
-
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            Title
-                                        </label>
-
-                                        <input type="text"
-                                            name="title"
-                                            class="form-control"
-                                            required>
-                                    </div>
-
-                                    <!-- DESCRIPTION -->
-
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            Description
-                                        </label>
-
-                                        <textarea
-                                            name="description"
-                                            class="form-control"
-                                            rows="4"
-                                            required></textarea>
-                                    </div>
-
-                                    <!-- FILE UPLOAD -->
-
-                                    <div class="upload-section"
-                                        id="uploadSection">
-
-                                        <div class="file-input-area"
-                                            id="dropZone">
-
-                                            <div class="upload-icon">
-                                                📁
-                                            </div>
-
-                                            <div>
-                                                Click or drag & drop files
-                                            </div>
-
-                                            <div class="small text-muted">
-                                                PDF, DOCX, JPG
-                                                (Max 10MB)
-                                            </div>
-
-                                            <input type="file"
-                                                name="files[]"
-                                                multiple
-                                                accept=".pdf,.docx,.jpg,.jpeg"
-                                                id="fileInput">
-                                        </div>
-
-                                        <!-- FILE LIST -->
-
-                                        <div id="fileList"
-                                            class="file-list mt-3">
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="modal-footer">
-
-                                    <button type="button"
-                                        class="btn btn-secondary"
-                                        data-bs-dismiss="modal">
-
-                                        Close
-                                    </button>
-
-                                    <button type="submit"
-                                        name="create_announcement"
-                                        class="btn btn-primary">
-
-                                        Post Announcement
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </form>
 
                 <?php
                 $posts = $classModel->getClassPosts($class_id);
@@ -522,8 +408,52 @@ if (isset($_GET['delete_post'])) {
         </div>
 
     </main>
-    <script src="../js/upload.js"></script>
+
+    <!-- Announcement modal (body-level so backdrop and dialog stack correctly) -->
+    <?php if ($isTeacher): ?>
+    <div class="modal fade" id="announcement" tabindex="-1" aria-labelledby="announcementLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form method="POST" enctype="multipart/form-data" class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="announcementLabel">New Announcement</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="announcementTitle">Title</label>
+                        <input type="text" id="announcementTitle" name="title" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="announcementDescription">Description</label>
+                        <textarea id="announcementDescription" name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+
+                    <div class="upload-section" id="uploadSection">
+                        <div class="file-input-area" id="dropZone">
+                            <div class="upload-icon">📁</div>
+                            <div>Click or drag & drop files</div>
+                            <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
+                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg" id="fileInput">
+                        </div>
+                        <div id="fileList" class="file-list mt-3"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="create_announcement" class="btn btn-primary">Post Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <?php if ($isTeacher): ?>
+    <script src="../js/upload.js"></script>
+    <?php endif; ?>
     <script src='../js/animate.js'></script>
     <script src='../js/mobile-menu.js'></script>
     
