@@ -116,6 +116,48 @@ if (isset($_GET['delete_post'])) {
     header("Location: class.php?class_id=" . $class_id);
     exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment'])) {
+
+    $title = $_POST['title'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $due_date = $_POST['due_date'] ?? null;
+    $points = $_POST['points'] ?? null;
+
+    $post_id = $classModel->createAssignment(
+        $class_id,
+        $user['user_id'],
+        $title,
+        $description,
+        $due_date,
+        $points
+    );
+
+    // 🔥 HANDLE FILES
+    if ($post_id && !empty($_FILES['files']['name'][0])) {
+
+        foreach ($_FILES['files']['name'] as $i => $name) {
+
+            $tmp = $_FILES['files']['tmp_name'][$i];
+
+            $unique = time() . '_' . $name;
+            $path = "documents/" . $unique;
+
+            move_uploaded_file($tmp, $path);
+
+            $classModel->addAttachment(
+                $post_id,
+                'other',
+                $path,
+                $name
+            );
+        }
+    }
+
+    header("Location: class.php?class_id=" . $class_id);
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -277,20 +319,16 @@ if (isset($_GET['delete_post'])) {
             <!-- RIGHT PANEL -->
             <div class="col-md-9">
 
-
-
+                <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">✏️ New Announcement</button>
                 <?php if ($isTeacher): ?>
-                <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">
-                    ✏️ New Announcement</button>
+                    <button class="btn btn-primary mb-3" type="button" data-bs-toggle="modal" data-bs-target="#assignment">➕ New Assignment</button>
                 <?php endif; ?>
-
-
                 <?php
                 $posts = $classModel->getClassPosts($class_id);
                 ?>
 
                 <?php foreach ($posts as $post): ?>
-
+                    <a href="<?php echo $post['type']."s.php?post_id=" . $post['post_id'] ?? "#" ?>" style="text-decoration:none;color:inherit;">
                     <div class="card p-3 mb-3 shadow-sm">
 
                         <!-- HEADER -->
@@ -400,17 +438,17 @@ if (isset($_GET['delete_post'])) {
                         <?php endif; ?>
 
                     </div>
-
+                    </a>        
                 <?php endforeach; ?>
-
+                        
             </div>
 
         </div>
 
     </main>
 
-    <!-- Announcement modal (body-level so backdrop and dialog stack correctly) -->
-    <?php if ($isTeacher): ?>
+    <!-- Announcement modal -->
+    
     <div class="modal fade" id="announcement" tabindex="-1" aria-labelledby="announcementLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form method="POST" enctype="multipart/form-data" class="modal-content">
@@ -448,15 +486,57 @@ if (isset($_GET['delete_post'])) {
             </form>
         </div>
     </div>
-    <?php endif; ?>
 
+    <div class="modal fade" id="assignment" tabindex="-1" aria-labelledby="assignmentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form method="POST" enctype="multipart/form-data" class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="assignmentLabel">New assignment</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="assignmentTitle">Title</label>
+                        <input type="text" id="assignmentTitle" name="title" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="assignmentDescription">Description</label>
+                        <textarea id="assignmentDescription" name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="assignmentDueDate">Due Date</label>
+                        <input type="datetime-local" id="assignmentDueDate" name="due_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="assignmentPoints">Points</label>
+                        <input type="number" id="assignmentPoints" name="points" class="form-control" min="0" max="100" default="0" required>
+                    </div>
+                    <div class="upload-section" id="uploadSection">
+                        <div class="file-input-area" id="dropZone">
+                            <div class="upload-icon">📁</div>
+                            <div>Click or drag & drop files</div>
+                            <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
+                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg" id="fileInput">
+                        </div>
+                        <div id="fileList" class="file-list mt-3"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="create_assignment" class="btn btn-primary">Post Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+                        
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <?php if ($isTeacher): ?>
     <script src="../js/upload.js"></script>
-    <?php endif; ?>
     <script src='../js/animate.js'></script>
     <script src='../js/mobile-menu.js'></script>
-    
+    <script src='../js/assignment.js'></script>
 </body>
 
 </html>
