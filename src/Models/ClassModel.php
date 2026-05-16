@@ -1,19 +1,40 @@
 <?php
-
 namespace App\Models;
 
 use App\Utils\Upload;
 use PDO;
 
+/**
+ * Handles database operations for classes, posts, assignments, submissions, and attachments. This model keeps LMS data access in one place so pages and controllers do not directly manage SQL.
+ *
+ * @package App\Models
+ * @author Charlo Marco
+ * @since 2026-05-17
+ */
 class ClassModel
 {
     private \PDO $conn;
 
+    /**
+     * Initializes the object with the dependencies it needs to perform its responsibility.
+     *
+     * @param mixed $database Database helper used to obtain the PDO connection.
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function __construct($database)
     {
         $this->conn = $database->getConnection();
     }
 
+    /**
+     * Creates a class and links the creator as teacher inside one transaction.
+     *
+     * @param mixed $user_id User identifier involved in the operation.
+     * @param array $data Associative array of values required by the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function createClass($user_id, $data)
     {
         try {
@@ -49,6 +70,13 @@ class ClassModel
         }
     }
 
+    /**
+     * Checks whether a generated class code is unused before class creation.
+     *
+     * @param mixed $classCode Class code value to check for uniqueness.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function checkClassCodeAvailability($classCode)
     {
         $sql = "SELECT class_id FROM Classes WHERE class_code = ?";
@@ -57,6 +85,13 @@ class ClassModel
         return $stmt->rowCount() === 0;
     }
 
+    /**
+     * Retrieves active classes joined by a user so the dashboard can show their courses.
+     *
+     * @param mixed $user_id User identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getClassesByUser($user_id)
     {
         try {
@@ -82,6 +117,13 @@ class ClassModel
             return [];
         }
     }
+    /**
+     * Retrieves student members of a class so the teacher can view enrollment.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getStudents($class_id)
     {
         try {
@@ -110,6 +152,14 @@ class ClassModel
         }
     }
 
+    /**
+     * Removes a student membership from a class when a teacher manages enrollment.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $student_id Student user identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function removeStudentFromClass($class_id, $student_id)
     {
         try {
@@ -129,6 +179,14 @@ class ClassModel
             return false;
         }
     }
+    /**
+     * Adds a student to a class by code while preventing invalid or duplicate membership.
+     *
+     * @param mixed $user_id User identifier involved in the operation.
+     * @param mixed $class_code Class code entered by the user.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function joinClassByCode($user_id, $class_code)
     {
         try {
@@ -183,6 +241,14 @@ class ClassModel
         }
     }
 
+    /**
+     * Removes a user from a class membership record.
+     *
+     * @param mixed $user_id User identifier involved in the operation.
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function leaveClass($user_id, $class_id)
     {
         try {
@@ -196,6 +262,18 @@ class ClassModel
         }
     }
 
+    /**
+     * Creates the shared post record used by announcements, materials, and assignments.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $postedBy User identifier of the post author.
+     * @param mixed $type Post type such as announcement, material, or assignment.
+     * @param mixed $title Post or class title value.
+     * @param mixed $description Text description value.
+     * @param mixed $due_date Optional due date for an assignment.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function createPost($class_id, $postedBy, $type, $title, $description, $due_date = null)
     {
         try {
@@ -221,6 +299,17 @@ class ClassModel
         }
     }
 
+    /**
+     * Creates an announcement post and optional attachment records as one workflow.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $postedBy User identifier of the post author.
+     * @param mixed $title Post or class title value.
+     * @param mixed $description Text description value.
+     * @param array $files Uploaded files array from the request.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function createAnnouncement($class_id, $postedBy, $title, $description, $files = [])
     {
         try {
@@ -296,6 +385,19 @@ class ClassModel
         }
     }
 
+    /**
+     * Creates an assignment post and its activity settings for grading.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $postedBy User identifier of the post author.
+     * @param mixed $title Post or class title value.
+     * @param mixed $description Text description value.
+     * @param mixed $due_date Optional due date for an assignment.
+     * @param mixed $max_score Maximum score allowed for the assignment.
+     * @param mixed $allow_late Whether late submissions are allowed.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function createAssignment($class_id, $postedBy, $title, $description, $due_date, $max_score = 100, $allow_late = false)
     {
         try {
@@ -330,6 +432,16 @@ class ClassModel
             return false;
         }
     }
+    /**
+     * Creates a material post and its material record for class resources.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $postedBy User identifier of the post author.
+     * @param mixed $title Post or class title value.
+     * @param mixed $description Text description value.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function createMaterial($class_id, $postedBy, $title, $description)
     {
         try {
@@ -364,6 +476,13 @@ class ClassModel
             return false;
         }
     }
+    /**
+     * Retrieves the teacher assigned to a class for display in the student list.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getTeacher($class_id)
     {
         try {
@@ -387,6 +506,13 @@ class ClassModel
             return false;
         }
     }
+    /**
+     * Retrieves posts and attachment summaries for a class stream.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getClassPosts($class_id)
     {
         try {
@@ -433,6 +559,13 @@ class ClassModel
         }
     }
 
+    /**
+     * Deletes a post, related records, and physical attachments to keep storage consistent.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function deletePost($post_id)
     {
         try {
@@ -472,6 +605,16 @@ class ClassModel
         }
     }
 
+    /**
+     * Stores an attachment record for a post after the file is moved to storage.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @param mixed $attachment_type Attachment type or extension to store.
+     * @param mixed $file_path Stored file path for the attachment.
+     * @param mixed $file_name Original file name for display.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function addAttachment($post_id, $attachment_type, $file_path, $file_name)
     {
         $sql = "INSERT INTO Attachment
@@ -488,6 +631,13 @@ class ClassModel
         ]);
     }
 
+    /**
+     * Retrieves ownership and type information so pages can authorize edits or deletes.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getPostOwner($post_id)
     {
         try {
@@ -506,6 +656,17 @@ class ClassModel
         }
     }
 
+    /**
+     * Updates post content and assignment settings while preserving post type rules.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @param mixed $title Post or class title value.
+     * @param mixed $description Text description value.
+     * @param mixed $due_date Optional due date for an assignment.
+     * @param mixed $max_score Maximum score allowed for the assignment.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function updatePost($post_id, $title, $description, $due_date = null, $max_score = null)
     {
         try {
@@ -569,6 +730,13 @@ class ClassModel
             return false;
         }
     }
+    /**
+     * Retrieves assignment details by post ID so the assignment page can load the activity.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getAssignmentByPostId($post_id)
     {
         try {
@@ -598,6 +766,13 @@ class ClassModel
         }
     }
 
+    /**
+     * Retrieves attachments for a post so pages can display linked files.
+     *
+     * @param mixed $post_id Post identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getPostAttachments($post_id)
     {
         try {
@@ -615,6 +790,14 @@ class ClassModel
         }
     }
 
+    /**
+     * Retrieves students, submissions, file counts, and grades for teacher grading view.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $activity_id Assignment activity identifier.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getAssignmentGrades($class_id, $activity_id)
     {
         try {
@@ -654,6 +837,16 @@ class ClassModel
         }
     }
 
+    /**
+     * Creates or updates a submission grade for a student in an assignment.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $student_id Student user identifier involved in the operation.
+     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $grade Grade value to save.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function saveStudentGrade($class_id, $student_id, $activity_id, $grade)
     {
         try {
@@ -689,6 +882,15 @@ class ClassModel
         }
     }
 
+    /**
+     * Retrieves a student submission row for assignment status and grade display.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $student_id Student user identifier involved in the operation.
+     * @param mixed $activity_id Assignment activity identifier.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getStudentSubmission($class_id, $student_id, $activity_id)
     {
         try {
@@ -720,6 +922,16 @@ class ClassModel
         }
     }
 
+    /**
+     * Creates or updates a submission and stores uploaded file records for student work.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $student_id Student user identifier involved in the operation.
+     * @param mixed $activity_id Assignment activity identifier.
+     * @param array $files Uploaded files array from the request.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function submitAssignmentFiles($class_id, $student_id, $activity_id, $files)
     {
         try {
@@ -821,6 +1033,13 @@ class ClassModel
         }
     }
 
+    /**
+     * Retrieves uploaded files for a submission so users can view submitted work.
+     *
+     * @param mixed $submission_id Submission identifier used to find files.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getSubmissionFiles($submission_id)
     {
         try {
@@ -842,6 +1061,15 @@ class ClassModel
         }
     }
 
+    /**
+     * Finds a student submission and returns its uploaded files for teacher review.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $student_id Student user identifier involved in the operation.
+     * @param mixed $activity_id Assignment activity identifier.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getSubmissionFilesByStudent($class_id, $student_id, $activity_id)
     {
         try {
@@ -858,6 +1086,14 @@ class ClassModel
         }
     }
 
+    /**
+     * Retrieves a class only when the user is its teacher for authorization-sensitive actions.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $user_id User identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getClassForTeacher($class_id, $user_id)
     {
         try {
@@ -891,6 +1127,15 @@ class ClassModel
         }
     }
 
+    /**
+     * Updates class details after confirming the user is authorized as teacher.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $user_id User identifier involved in the operation.
+     * @param array $data Associative array of values required by the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function updateClass($class_id, $user_id, $data)
     {
         try {
@@ -952,6 +1197,14 @@ class ClassModel
         }
     }
 
+    /**
+     * Archives a class so it is hidden without permanently deleting its records.
+     *
+     * @param mixed $class_id Class identifier involved in the operation.
+     * @param mixed $user_id User identifier involved in the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function deleteClass($class_id, $user_id)
     {
         try {

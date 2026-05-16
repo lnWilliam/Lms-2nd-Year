@@ -1,14 +1,27 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Helpers\Sanitizer;
 use App\Helpers\Validator;
 
+/**
+ * Coordinates user registration, login, and field validation workflows. This controller separates authentication rules from page rendering so account data is prepared before model calls.
+ *
+ * @package App\Controllers
+ * @author Charlo Marco
+ * @since 2026-05-17
+ */
 class UserController
 {
     private $user;
 
+    /**
+     * Initializes the object with the dependencies it needs to perform its responsibility.
+     *
+     * @param mixed $user User model dependency used for account lookup and persistence.
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function __construct($user)
     {
         $this->user = $user;
@@ -16,6 +29,13 @@ class UserController
 
     /**
      * Validate and sanitize user input for registration
+     */
+    /**
+     * Sanitizes login input and verifies credentials so only valid users are allowed into the system.
+     *
+     * @param array $input Input data collected from a form or JSON request.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
     public function validateAndProcessLogin($input)
     {
@@ -53,6 +73,13 @@ class UserController
     }
 
     
+    /**
+     * Sanitizes, validates, hashes, and stores registration data so new users are created safely.
+     *
+     * @param array $input Input data collected from a form or JSON request.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function validateAndProcessRegistration($input)
     {
         Validator::clearErrors();
@@ -139,6 +166,13 @@ class UserController
     /**
      * Validate username only (for API)
      */
+    /**
+     * Sanitizes and validates only a username for asynchronous registration checks.
+     *
+     * @param mixed $username Username value to check or validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function validateUsernameOnly($username)
     {
         Validator::clearErrors();
@@ -163,6 +197,13 @@ class UserController
     }
     
 
+    /**
+     * Sanitizes and validates only an email address for asynchronous registration checks.
+     *
+     * @param mixed $email Email address value to check or validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function validateEmailOnly($email)
     {
         Validator::clearErrors();

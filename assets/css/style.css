@@ -588,3 +588,167 @@ html::before {
         );
     opacity: 0.9;
 }
+
+/* LOGIN FORM STRICT/VISUAL PATCH */
+.container {
+    overflow: hidden;
+}
+
+.panel {
+    min-height: auto;
+    padding-bottom: 20px;
+    overflow: hidden;
+}
+
+.rightPanel {
+    overflow-y: auto;
+}
+
+form {
+    gap: 0;
+}
+
+.input-box {
+    position: relative;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.input-box input {
+    width: 100%;
+    height: 47px;
+    padding: 14px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: transparent;
+    font-size: 14px;
+}
+
+.password-box input {
+    padding-right: 48px;
+}
+
+.input-box label {
+    position: absolute;
+    top: 23.5px;
+    left: 12px;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0 6px;
+    color: #777;
+    font-size: 14px;
+    transition: 0.25s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.input-box input:focus + label,
+.input-box input:not(:placeholder-shown) + label {
+    top: 0;
+    font-size: 12px;
+    color: #0ea5e9;
+}
+
+.username-status,
+.email-status,
+.confirm_error {
+    display: block;
+    min-height: 14px;
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.username-status:empty,
+.email-status:empty,
+.confirm_error:empty {
+    min-height: 0;
+    margin-top: 0;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 23.5px;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+    z-index: 3;
+}
+
+.toggle-password:hover {
+    transform: translateY(-50%);
+    box-shadow: none;
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+}
+
+.leftPanel,
+.midPanel,
+.rightPanel {
+    overflow: hidden;
+}
+
+#toggle:checked ~ .leftPanel {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#toggle:checked ~ .rightPanel {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.message {
+    width: 900px;
+    max-width: calc(100% - 2rem);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    height: fit-content;
+    text-align: center;
+    padding: 12px;
+    margin-bottom: 12px;
+    z-index: 2;
+}
+
+.message.error {
+    background-color: #dc2626;
+    color: white;
+}
+
+.message.success {
+    background-color: #16a34a;
+    color: white;
+}
+
+body > button {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 5;
+    width: auto;
+}
+
+body > button a {
+    color: white;
+    text-decoration: none;
+}
+
+@media (max-width: 767px) {
+    .container {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}

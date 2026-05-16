@@ -1,19 +1,39 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Helpers\Sanitizer;
 use App\Helpers\Validator;
 
+/**
+ * Coordinates class-related validation before database actions are performed. This controller keeps class creation rules outside the page file so data is sanitized, validated, and checked before writes.
+ *
+ * @package App\Controllers
+ * @author Charlo Marco
+ * @since 2026-05-17
+ */
 class ClassController
 {
     private $classModel;
 
+    /**
+     * Initializes the object with the dependencies it needs to perform its responsibility.
+     *
+     * @param mixed $classModel Class model used for class validation and persistence.
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function __construct($classModel)
     {
         $this->classModel = $classModel;
     }
 
+    /**
+     * Sanitizes and validates class creation data before creating the class and teacher membership records.
+     *
+     * @param array $input Input data collected from a form or JSON request.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function validateAndProcessClass($input)
     {
         Validator::clearErrors();
@@ -60,6 +80,13 @@ class ClassController
     }
 
 
+    /**
+     * Sanitizes and validates only a class name for asynchronous UI validation.
+     *
+     * @param mixed $className Class name value to validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function validateClassNameOnly($className)
     {
         Validator::clearErrors();
