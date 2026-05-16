@@ -96,7 +96,6 @@ if (isset($_SESSION['success'])) {
     body{display: flex; flex-direction: column; align-items: center; justify-content: center; }
 </style>
 <body>
-    <button type="button"><a href="home.html">Home</a></button>
 
     <?php if ($message): ?>
         <div class="message <?php echo htmlspecialchars($messageType); ?>">

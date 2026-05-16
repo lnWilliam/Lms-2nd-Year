@@ -204,7 +204,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                         <ul class="list-group list-group-flush">
                             <?php foreach ($teacherAttachments as $file): ?>
                                 <li class="list-group-item bg-transparent px-0">
-                                    <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                    <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
                                         📎 <?= htmlspecialchars($file['file_name']) ?>
                                     </a>
                                 </li>
@@ -232,7 +232,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                             <ul class="list-group list-group-flush mb-3">
                                 <?php foreach ($myFiles as $file): ?>
                                     <li class="list-group-item bg-transparent px-0">
-                                        <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                        <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
                                             📄 <?= htmlspecialchars($file['file_name']) ?>
                                         </a>
                                     </li>
@@ -291,7 +291,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                                     <?php if (!empty($studentFiles)): ?>
                                                         <?php foreach ($studentFiles as $file): ?>
                                                             <div class="mb-1">
-                                                                <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                                                <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
                                                                     📄 <?= htmlspecialchars($file['file_name']) ?>
                                                                 </a>
                                                             </div>

@@ -1,146 +1,121 @@
 document.addEventListener("DOMContentLoaded", function () {
-        // File selection for upload
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
+    /**
+     * Handles every upload box on the page.
+     * This works for both the Announcement modal and the Assignment modal.
+     */
+    document.querySelectorAll('.upload-section').forEach(function (section) {
+        const fileInput = section.querySelector('input[type="file"]');
+        const fileList = section.querySelector('.file-list');
+        const dropZone = section.querySelector('.file-input-area') || section;
         let selectedFiles = [];
-        
-        fileInput.addEventListener('change', function(e) {
-            selectedFiles = Array.from(e.target.files);
-            updateFileList();
-        });
-        
+
+        if (!fileInput || !fileList || !dropZone) {
+            return;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) {
+                return bytes + ' B';
+            }
+
+            if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(1) + ' KB';
+            }
+
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function syncInputFiles() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(function (file) {
+                dataTransfer.items.add(file);
+            });
+
+            fileInput.files = dataTransfer.files;
+        }
+
         function updateFileList() {
+            fileList.innerHTML = '';
+
             if (selectedFiles.length === 0) {
                 fileList.classList.remove('active');
-               
                 return;
             }
-            
+
             fileList.classList.add('active');
-            
-            let html = '<h4 style="margin-bottom: 10px;">Selected Files:</h4>';
-            selectedFiles.forEach((file, index) => {
-                const size = (file.size / 1024).toFixed(2);
-                html += `
-                    <div class="file-item">
-                        <span class="file-name">📄 ${file.name}</span>
-                        <span class="file-size">${size} KB</span>
-                        <span class="remove-file" onclick="removeFile(${index})">✖</span>
-                    </div>
-                `;
+
+            const title = document.createElement('h6');
+            title.className = 'mb-2 fw-bold';
+            title.textContent = 'Selected Files:';
+            fileList.appendChild(title);
+
+            selectedFiles.forEach(function (file, index) {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+
+                const name = document.createElement('span');
+                name.className = 'file-name';
+                name.textContent = '📄 ' + file.name;
+
+                const size = document.createElement('span');
+                size.className = 'file-size';
+                size.textContent = formatFileSize(file.size);
+
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'remove-file';
+                remove.textContent = '✖';
+                remove.setAttribute('aria-label', 'Remove ' + file.name);
+                remove.addEventListener('click', function () {
+                    selectedFiles.splice(index, 1);
+                    syncInputFiles();
+                    updateFileList();
+                });
+
+                item.appendChild(name);
+                item.appendChild(size);
+                item.appendChild(remove);
+                fileList.appendChild(item);
             });
-            fileList.innerHTML = html;
         }
-        
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            const dt = new DataTransfer();
-            selectedFiles.forEach(file => dt.items.add(file));
-            fileInput.files = dt.files;
-            updateFileList();
-        }
-        
-        // Drag and drop
-        const dropZone = document.getElementById('dropZone');
-        const uploadSection = document.getElementById('uploadSection');
-        
-        dropZone.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            uploadSection.classList.add('drag-over');
-        });
-        
-        dropZone.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            uploadSection.classList.remove('drag-over');
-        });
-        
-        dropZone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            uploadSection.classList.remove('drag-over');
-            const files = Array.from(e.dataTransfer.files);
-            const dt = new DataTransfer();
-            [...selectedFiles, ...files].forEach(file => dt.items.add(file));
-            fileInput.files = dt.files;
-            selectedFiles = Array.from(fileInput.files);
+
+        fileInput.addEventListener('change', function (event) {
+            selectedFiles = Array.from(event.target.files || []);
             updateFileList();
         });
-        
-        // Document selection for bulk delete
-        let selectedDocuments = [];
-        
-        function updateSelection() {
-            const checkboxes = document.querySelectorAll('.document-checkbox:checked');
-            selectedDocuments = Array.from(checkboxes).map(cb => cb.value);
-            
-            const selectionToolbar = document.getElementById('selectionToolbar');
-            const selectedCountSpan = document.getElementById('selectedCount');
-            const selectedFilesInput = document.getElementById('selectedFilesInput');
-            
-            if (selectedDocuments.length > 0) {
-                selectionToolbar.classList.add('show');
-                selectedCountSpan.textContent = selectedDocuments.length;
-                
-                // Update hidden inputs for form submission
-                selectedFilesInput.innerHTML = '';
-                selectedDocuments.forEach(file => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_files[]';
-                    input.value = file;
-                    selectedFilesInput.appendChild(input);
-                });
-                
-                // Highlight selected cards
-                document.querySelectorAll('.document-card').forEach(card => {
-                    const filename = card.dataset.filename;
-                    if (selectedDocuments.includes(filename)) {
-                        card.classList.add('selected');
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                });
-            } else {
-                selectionToolbar.classList.remove('show');
-                document.querySelectorAll('.document-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-            }
-        }
-        
-        function toggleSelectAll() {
-            const checkboxes = document.querySelectorAll('.document-checkbox');
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-            checkboxes.forEach(cb => cb.checked = !allChecked);
-            updateSelection();
-        }
-        
-        function clearSelection() {
-            document.querySelectorAll('.document-checkbox').forEach(cb => cb.checked = false);
-            updateSelection();
-        }
-        
-        function deleteSingleFile(filename) {
-            if (confirm('Delete this file?')) {
-                window.location.href = `index.php?delete=${encodeURIComponent(filename)}`;
-            }
-        }
-        
-        function viewDocument(filename, type) {
-            if (type === 'jpg' || type === 'jpeg') {
-                window.open('documents/' + filename, '_blank');
-            } else {
-                window.location.href = `viewer.php?file=${encodeURIComponent(filename)}&type=${type}`;
-            }
-        }
-        
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 300);
-                }, 4000);
-            });
-        }, 1000);
+
+        dropZone.addEventListener('dragover', function (event) {
+            event.preventDefault();
+            section.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function (event) {
+            event.preventDefault();
+            section.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function (event) {
+            event.preventDefault();
+            section.classList.remove('drag-over');
+
+            const droppedFiles = Array.from(event.dataTransfer.files || []);
+            selectedFiles = selectedFiles.concat(droppedFiles);
+            syncInputFiles();
+            updateFileList();
+        });
+    });
+
+    /**
+     * Auto-hide alerts after a short delay.
+     */
+    setTimeout(function () {
+        document.querySelectorAll('.alert').forEach(function (alert) {
+            alert.style.transition = 'opacity 0.3s ease';
+            alert.style.opacity = '0';
+
+            setTimeout(function () {
+                alert.remove();
+            }, 300);
+        });
+    }, 5000);
 });
