@@ -59,7 +59,8 @@ class ClassModel
 
     public function getClassesByUser($user_id)
     {
-        $sql = "SELECT
+        try {
+            $sql = "SELECT
             c.class_id,
             c.class_name,
             c.class_desc,
@@ -72,10 +73,14 @@ class ClassModel
         WHERE cu.user_id = ?
         AND c.status = 'Active'";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$user_id]);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$user_id]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get classes by user error: " . $e->getMessage());
+            return [];
+        }
     }
     public function getStudents($class_id)
     {
@@ -361,7 +366,8 @@ class ClassModel
     }
     public function getTeacher($class_id)
     {
-        $sql = "SELECT
+        try {
+            $sql = "SELECT
             u.first_name,
             u.last_name,
             a.email
@@ -372,10 +378,14 @@ class ClassModel
         AND cu.role = 'teacher'
         LIMIT 1";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$class_id]);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$class_id]);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get teacher error: " . $e->getMessage());
+            return false;
+        }
     }
     public function getClassPosts($class_id)
     {
@@ -480,15 +490,20 @@ class ClassModel
 
     public function getPostOwner($post_id)
     {
-        $stmt = $this->conn->prepare("
-        SELECT post_id, postedBy, type
-        FROM Post
-        WHERE post_id = ?
-    ");
+        try {
+            $stmt = $this->conn->prepare("
+            SELECT post_id, postedBy, type
+            FROM Post
+            WHERE post_id = ?
+        ");
 
-        $stmt->execute([$post_id]);
+            $stmt->execute([$post_id]);
 
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get post owner error: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function updatePost($post_id, $title, $description, $due_date = null, $max_score = null)
@@ -843,10 +858,10 @@ class ClassModel
         }
     }
 
-public function getClassForTeacher($class_id, $user_id)
-{
-    try {
-        $sql = "SELECT
+    public function getClassForTeacher($class_id, $user_id)
+    {
+        try {
+            $sql = "SELECT
                     c.class_id,
                     c.class_name,
                     c.class_desc,
@@ -862,20 +877,19 @@ public function getClassForTeacher($class_id, $user_id)
                 AND c.status = 'Active'
                 LIMIT 1";
 
-        $stmt = $this->conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
 
-        $stmt->execute([
-            $class_id,
-            $user_id
-        ]);
+            $stmt->execute([
+                $class_id,
+                $user_id
+            ]);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-
-    } catch (\PDOException $e) {
-        error_log("Get teacher class error: " . $e->getMessage());
-        return false;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get teacher class error: " . $e->getMessage());
+            return false;
+        }
     }
-}
 
     public function updateClass($class_id, $user_id, $data)
     {
@@ -938,30 +952,29 @@ public function getClassForTeacher($class_id, $user_id)
         }
     }
 
-public function deleteClass($class_id, $user_id)
-{
-    try {
-        $class = $this->getClassForTeacher($class_id, $user_id);
+    public function deleteClass($class_id, $user_id)
+    {
+        try {
+            $class = $this->getClassForTeacher($class_id, $user_id);
 
-        if (!$class) {
-            return false;
-        }
+            if (!$class) {
+                return false;
+            }
 
-        $sql = "UPDATE Classes
+            $sql = "UPDATE Classes
                 SET status = 'Inactive'
                 WHERE class_id = ?
                 AND created_by = ?";
 
-        $stmt = $this->conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
 
-        return $stmt->execute([
-            $class_id,
-            $user_id
-        ]);
-
-    } catch (\PDOException $e) {
-        error_log("Archive class error: " . $e->getMessage());
-        return false;
+            return $stmt->execute([
+                $class_id,
+                $user_id
+            ]);
+        } catch (\PDOException $e) {
+            error_log("Archive class error: " . $e->getMessage());
+            return false;
+        }
     }
-}
 }
