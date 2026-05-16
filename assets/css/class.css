@@ -690,4 +690,102 @@
     .class-code-display {
         border-radius: calc(var(--lms-radius) + 2px);
     }
+
+    /* Edit Button */
+.btn-edit-post {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    border: none;
+    border-radius: var(--lms-radius-sm);
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    text-decoration: none;
+}
+
+.btn-edit-post:hover {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+    color: #111827;
+}
+
+/* Delete Button */
+.delete-post-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    border: none;
+    border-radius: var(--lms-radius-sm);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    text-decoration: none;
+}
+
+.delete-post-btn:hover {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+    color: #ffffff;
+}
+
+/* Edit Modal */
+.edit-post-modal .modal-content {
+    border: 1px solid var(--lms-border);
+    border-radius: var(--lms-radius);
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+}
+
+.edit-post-modal .modal-header {
+    background: var(--lms-surface-2);
+    border-bottom: 1px solid var(--lms-border);
+}
+
+.edit-post-modal .modal-title {
+    font-weight: 800;
+    color: var(--lms-text);
+}
+
+.edit-post-modal textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+}
+
+/* FIX: Bootstrap modal hidden/click blocked by layout */
+body.modal-open .lms-main {
+    z-index: auto !important;
+}
+
+body.modal-open .modal-backdrop {
+    z-index: 1040 !important;
+    pointer-events: none !important;
+}
+
+body.modal-open .modal {
+    z-index: 1055 !important;
+    pointer-events: auto !important;
+}
+
+body.modal-open .edit-post-modal .modal-dialog {
+    position: relative;
+    z-index: 1060 !important;
+    pointer-events: auto !important;
+}
+
+body.modal-open .edit-post-modal .modal-content {
+    position: relative;
+    z-index: 1061 !important;
+    pointer-events: auto !important;
+}
+
 }

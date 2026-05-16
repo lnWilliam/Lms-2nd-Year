@@ -6,8 +6,6 @@ use App\Helpers\Database;
 use App\Models\ClassModel;
 use App\Utils\Upload;
 
-
-
 // 🔐 Check login
 if (!isset($_SESSION["user_data"])) {
     header('Location: ../../logout.php');
@@ -40,6 +38,7 @@ foreach ($classes as $c) {
         break;
     }
 }
+
 $students = $classModel->getStudents($class_id);
 
 if (!$currentClass) {
@@ -54,6 +53,54 @@ if (empty($currentClass['class_desc'])) {
     $currentClass['class_desc'] = "No description";
 }
 
+// ✏️ Edit announcement / assignment
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
+
+    $post_id = (int) ($_POST['post_id'] ?? 0);
+    $title = $_POST['title'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $due_date = $_POST['due_date'] ?? null;
+    $points = $_POST['points'] ?? null;
+
+    $post = $classModel->getPostOwner($post_id);
+
+    if ($post) {
+
+        $canEdit = false;
+
+        // Teacher can edit announcement or assignment they made
+        if (
+            $isTeacher &&
+            $post['postedBy'] == $user['user_id'] &&
+            in_array($post['type'], ['announcement', 'assignment'])
+        ) {
+            $canEdit = true;
+        }
+
+        // Student can edit only their own announcement
+        if (
+            !$isTeacher &&
+            $post['type'] === 'announcement' &&
+            $post['postedBy'] == $user['user_id']
+        ) {
+            $canEdit = true;
+        }
+
+        if ($canEdit) {
+            $classModel->updatePost(
+                $post_id,
+                $title,
+                $description,
+                $due_date,
+                $points
+            );
+        }
+    }
+
+    header("Location: class.php?class_id=" . $class_id);
+    exit();
+}
+
 // 🧑‍🎓 Remove student from class
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_student_id'])) {
 
@@ -66,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_student_id']))
     exit();
 }
 
+// 📢 Create announcement
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement'])) {
 
     $title = $_POST['title'] ?? '';
@@ -85,14 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
 
             $tmp = $_FILES['files']['tmp_name'][$i];
 
+            if (empty($tmp)) {
+                continue;
+            }
+
             $unique = time() . '_' . $name;
             $path = "documents/" . $unique;
 
             move_uploaded_file($tmp, $path);
 
+            $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
             $classModel->addAttachment(
                 $post_id,
-                'other',
+                $extension,
                 $path,
                 $name
             );
@@ -103,22 +157,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
     exit();
 }
 
-
-
+// 🗑 Delete post using POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
 
     $post_id = $_POST['delete_post_id'];
+    $post = $classModel->getPostOwner($post_id);
 
-    $classModel->deletePost($post_id);
+    if ($post && ($isTeacher || $post['postedBy'] == $user['user_id'])) {
+        $classModel->deletePost($post_id);
+    }
 
     header("Location: class.php?class_id=" . $class_id);
     exit;
 }
+
+// 🗑 Delete post using GET
 if (isset($_GET['delete_post'])) {
 
     $post_id = (int) $_GET['delete_post'];
 
-    // optional safety check (teacher OR owner)
     $post = $classModel->getPostOwner($post_id);
 
     if ($post && ($isTeacher || $post['postedBy'] == $user['user_id'])) {
@@ -129,6 +186,7 @@ if (isset($_GET['delete_post'])) {
     exit();
 }
 
+// 📝 Create assignment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment'])) {
 
     $title = $_POST['title'] ?? '';
@@ -152,14 +210,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
             $tmp = $_FILES['files']['tmp_name'][$i];
 
+            if (empty($tmp)) {
+                continue;
+            }
+
             $unique = time() . '_' . $name;
             $path = "documents/" . $unique;
 
             move_uploaded_file($tmp, $path);
 
+            $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
             $classModel->addAttachment(
                 $post_id,
-                'other',
+                $extension,
                 $path,
                 $name
             );
@@ -193,9 +257,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light lms-topbar fixed-top px-3">
         <div class="container-fluid gap-2 align-items-center lms-topbar-inner">
+
             <button class="navbar-toggler d-lg-none lms-sidebar-toggler flex-shrink-0" type="button" aria-controls="Primary navigation" aria-expanded="false" aria-label="Open side navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <a class="navbar-brand d-flex align-items-center flex-shrink-0" href="home.php">
                 <span class="brand-mark" aria-hidden="true">◆</span>
                 MyLMS
@@ -211,15 +277,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
             <div class="collapse lms-mobile-nav-drawer d-lg-none w-100" id="lmsMobileNavMore">
                 <div class="lms-mobile-nav-drawer-inner d-flex flex-column gap-2">
+
                     <div class="dropdown">
-                        <a class="btn dropdown-toggle w-100 text-start" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="true" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
+                        <a class="btn dropdown-toggle w-100 text-start" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="true" aria-expanded="false">
+                            👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?>
+                        </a>
+
                         <ul class="dropdown-menu dropdown-menu-end w-100">
                             <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
                             <li><a class="dropdown-item" href="#">Preferences</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
                         </ul>
                     </div>
+
                 </div>
             </div>
 
@@ -228,24 +301,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                     <input class="form-control" type="search" name="q" placeholder="Search courses…" aria-label="Search courses">
                     <button class="btn btn-lms-primary" type="submit">Search</button>
                 </form>
+
                 <div class="dropdown">
-                    <a class="btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?></a>
+                    <a class="btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        👤 <?php echo htmlspecialchars($user['first_name'] ?? ''); ?>
+                    </a>
+
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
                         <li><a class="dropdown-item" href="#">Preferences</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
                     </ul>
                 </div>
+
             </div>
+
         </div>
     </nav>
+
     <!-- SIDEBAR -->
     <aside class="sidebar lms-sidebar">
         <p class="sidebar-label">Learn</p>
-        <a href="home.php"><span class="nav-ico" aria-hidden="true">⌂</span>Home</a>
-        <a href="#"><span class="nav-ico" aria-hidden="true">▤</span> Calendar </a>
-        <a href="#"><span class="nav-ico" aria-hidden="true">◎</span> Classes</a>
+
+        <a href="home.php">
+            <span class="nav-ico" aria-hidden="true">⌂</span>
+            Home
+        </a>
+
+        <a href="#">
+            <span class="nav-ico" aria-hidden="true">▤</span>
+            Calendar
+        </a>
+
+        <a href="#">
+            <span class="nav-ico" aria-hidden="true">◎</span>
+            Classes
+        </a>
+
         <p class="sidebar-label">Classes</p>
 
         <?php foreach ($classes as $c): ?>
@@ -264,7 +359,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
             <h2>
                 <?php echo htmlspecialchars($currentClass['class_name']); ?>
 
-                <!-- ROLE BADGE -->
                 <span class="badge bg-<?php echo $isTeacher ? 'danger' : 'secondary'; ?>">
                     <?php echo ucfirst($currentClass['role']); ?>
                 </span>
@@ -272,6 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
             <p><?php echo htmlspecialchars($currentClass['class_desc']); ?></p>
         </div>
+
         <div class='row shadow p-3 mb-3 bg-body-tertiary rounded mx-0'>
             <ul class="nav gap-5">
                 <li class="nav-item">
@@ -279,9 +374,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         Stream
                     </button>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#">Classwork</a>
                 </li>
+
                 <li class="nav-item">
                     <button class="nav-link border-0 bg-transparent" type="button" id="getStudents">
                         Student
@@ -289,32 +386,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 </li>
             </ul>
         </div>
+
         <div class="row">
 
             <!-- LEFT PANEL -->
             <div class="col-md-3">
 
-                <!-- TEACHER PANEL -->
                 <?php if ($isTeacher): ?>
+
                     <div class="card p-3 mb-3 teacher-panel">
                         <h5>⚙️ Teacher Panel</h5>
 
-                        <a href="edit_class.php?class_id=<?php echo $class_id; ?>" class="btn btn-light btn-sm mb-2">
+                        <a href="edit_class.php?class_id=<?= htmlspecialchars($class_id) ?>" class="btn btn-light btn-sm mb-2">
                             ✏️ Edit Class
                         </a>
 
-                        <a href="delete_class.php?class_id=<?php echo $class_id; ?>" class="btn btn-light btn-sm">
+                        <a href="delete_class.php?class_id=<?= htmlspecialchars($class_id) ?>" class="btn btn-light btn-sm">
                             🗑 Delete Class
                         </a>
-
                     </div>
+
                     <div class="card p-3 mb-3 teacher-panel">
                         <p class='fw-bold'>Class Code</p>
-                        <h2 class='fw-bold'><?php echo $currentClass['class_code']; ?><h2>
+                        <h2 class='fw-bold'><?php echo htmlspecialchars($currentClass['class_code']); ?></h2>
                     </div>
+
                 <?php endif; ?>
 
-                <!-- STUDENT PANEL -->
                 <?php if (!$isTeacher): ?>
                     <div class="card p-3 mb-3">
                         <h5>📘 Class Info</h5>
@@ -330,146 +428,286 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 <!-- STREAM SECTION -->
                 <div id="streamSection">
 
-                <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">✏️ New Announcement</button>
-                <?php if ($isTeacher): ?>
-                    <button class="btn btn-primary mb-3" type="button" data-bs-toggle="modal" data-bs-target="#assignment">➕ New Assignment</button>
-                <?php endif; ?>
-                <?php
-                $posts = $classModel->getClassPosts($class_id);
-                ?>
+                    <button class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#announcement">
+                        ✏️ New Announcement
+                    </button>
 
-                <?php foreach ($posts as $post): ?>
-                    <a href="<?php echo $post['type']."s.php?post_id=" . $post['post_id'] ?? "#" ?>" style="text-decoration:none;color:inherit;">
-                    <div class="card p-3 mb-3 shadow-sm">
+                    <?php if ($isTeacher): ?>
+                        <button class="btn btn-primary mb-3" type="button" data-bs-toggle="modal" data-bs-target="#assignment">
+                            ➕ New Assignment
+                        </button>
+                    <?php endif; ?>
 
-                        <!-- HEADER -->
+                    <?php
+                    $posts = $classModel->getClassPosts($class_id);
+                    ?>
 
-                        <div class="d-flex justify-content-between">
+                    <?php foreach ($posts as $post): ?>
 
-                            <div>
+                        <?php
+                        $postLink = $post['type'] . "s.php?post_id=" . $post['post_id'];
 
-                                <strong>
-                                    <?= htmlspecialchars($post['first_name']) ?>
-                                    <?= htmlspecialchars($post['last_name']) ?>
-                                </strong>
+                        $canEditPost = false;
 
-                                <span class="badge bg-success">
-                                    <?= ucfirst($post['type']) ?>
-                                </span>
+                        // Teacher can edit only announcement/assignment they made
+                        if (
+                            $isTeacher &&
+                            $post['postedBy'] == $user['user_id'] &&
+                            in_array($post['type'], ['announcement', 'assignment'])
+                        ) {
+                            $canEditPost = true;
+                        }
+
+                        // Student can edit only their own announcement
+                        if (
+                            !$isTeacher &&
+                            $post['type'] === 'announcement' &&
+                            $post['postedBy'] == $user['user_id']
+                        ) {
+                            $canEditPost = true;
+                        }
+
+                        $canDeletePost = ($isTeacher || $post['postedBy'] == $user['user_id']);
+                        ?>
+
+                        <div class="card p-3 mb-3 shadow-sm">
+
+                            <!-- HEADER -->
+                            <div class="d-flex justify-content-between">
+
+                                <div>
+                                    <strong>
+                                        <?= htmlspecialchars($post['first_name']) ?>
+                                        <?= htmlspecialchars($post['last_name']) ?>
+                                    </strong>
+
+                                    <span class="badge bg-success">
+                                        <?= ucfirst(htmlspecialchars($post['type'])) ?>
+                                    </span>
+                                </div>
+
+                                <small class="text-muted">
+                                    <?= htmlspecialchars($post['created_at']) ?>
+                                </small>
 
                             </div>
 
-                            <small class="text-muted">
-                                <?= $post['created_at'] ?>
-                            </small>
+                            <hr>
+
+                            <!-- TITLE -->
+                            <?php if (!empty($post['title'])): ?>
+                                <h5>
+                                    <?= htmlspecialchars($post['title']) ?>
+                                </h5>
+                            <?php endif; ?>
+
+                            <!-- DESCRIPTION -->
+                            <p>
+                                <?= nl2br(htmlspecialchars($post['description'])) ?>
+                            </p>
+
+                            <!-- DUE DATE -->
+                            <?php if (!empty($post['due_date'])): ?>
+                                <p class="text-danger">
+                                    <strong>Due:</strong>
+                                    <?= htmlspecialchars($post['due_date']) ?>
+                                </p>
+                            <?php endif; ?>
+
+                            <!-- POINTS -->
+                            <?php if ($post['type'] === 'assignment' && isset($post['max_score'])): ?>
+                                <p class="text-primary">
+                                    <strong>Points:</strong>
+                                    <?= htmlspecialchars($post['max_score']) ?>
+                                </p>
+                            <?php endif; ?>
+
+                            <!-- ATTACHMENTS -->
+                            <?php if (!empty($post['file_paths'])): ?>
+
+                                <?php
+                                $filePaths = explode('||', $post['file_paths']);
+                                $fileNames = explode('||', $post['file_names']);
+                                $fileTypes = explode('||', $post['attachment_types']);
+                                ?>
+
+                                <div class="mt-3">
+                                    <strong>Attachments:</strong>
+
+                                    <ul class="list-group mt-2">
+
+                                        <?php foreach ($filePaths as $i => $path): ?>
+
+                                            <?php
+                                            $name = $fileNames[$i] ?? 'file';
+                                            $type = $fileTypes[$i] ?? 'other';
+                                            $url = "/NewSite/" . $path;
+                                            ?>
+
+                                            <li class="list-group-item">
+
+                                                <?php if ($type === 'jpg' || $type === 'jpeg' || $type === 'png' || $type === 'image'): ?>
+                                                    <img src="<?= htmlspecialchars($url) ?>" style="max-width:200px;">
+                                                <?php endif; ?>
+
+                                                <a href="<?= htmlspecialchars($url) ?>" target="_blank">
+                                                    📎 <?= htmlspecialchars($name) ?>
+                                                </a>
+
+                                            </li>
+
+                                        <?php endforeach; ?>
+
+                                    </ul>
+                                </div>
+
+                            <?php endif; ?>
+
+                            <!-- ACTION BUTTONS -->
+                            <div class="d-flex gap-2 flex-wrap mt-3">
+
+                                <a href="<?= htmlspecialchars($postLink) ?>" class="btn btn-outline-primary btn-sm">
+                                    View
+                                </a>
+
+                                <?php if ($canEditPost): ?>
+                                    <button
+                                        type="button"
+                                        class="btn-edit-post"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editPostModal<?= htmlspecialchars($post['post_id']) ?>">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                        Edit
+                                    </button>
+                                <?php endif; ?>
+
+                                <?php if ($canDeletePost): ?>
+                                    <a href="class.php?class_id=<?= htmlspecialchars($class_id) ?>&delete_post=<?= htmlspecialchars($post['post_id']) ?>"
+                                        class="delete-post-btn"
+                                        onclick="return confirm('Delete this post?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                        Delete
+                                    </a>
+                                <?php endif; ?>
+
+                            </div>
 
                         </div>
 
-                        <hr>
+                        <!-- EDIT MODAL -->
+                        <?php if ($canEditPost): ?>
+                            <div class="modal fade edit-post-modal" id="editPostModal<?= htmlspecialchars($post['post_id']) ?>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
 
-                        <!-- TITLE -->
+                                    <form method="POST" class="modal-content">
 
-                        <?php if (!empty($post['title'])): ?>
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5">
+                                                Edit <?= ucfirst(htmlspecialchars($post['type'])) ?>
+                                            </h1>
 
-                            <h5>
-                                <?= htmlspecialchars($post['title']) ?>
-                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
 
-                        <?php endif; ?>
+                                        <div class="modal-body">
 
-                        <!-- DESCRIPTION -->
+                                            <input type="hidden" name="post_id" value="<?= htmlspecialchars($post['post_id']) ?>">
 
-                        <p>
-                            <?= nl2br(htmlspecialchars($post['description'])) ?>
-                        </p>
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Title
+                                                </label>
 
-                        <!-- DUE DATE -->
+                                                <input
+                                                    type="text"
+                                                    name="title"
+                                                    class="form-control"
+                                                    value="<?= htmlspecialchars($post['title']) ?>"
+                                                    required>
+                                            </div>
 
-                        <?php if (!empty($post['due_date'])): ?>
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Description
+                                                </label>
 
-                            <p class="text-danger">
+                                                <textarea
+                                                    name="description"
+                                                    class="form-control"
+                                                    rows="5"
+                                                    required><?= htmlspecialchars($post['description']) ?></textarea>
+                                            </div>
 
-                                <strong>Due:</strong>
+                                            <?php if ($post['type'] === 'assignment'): ?>
 
-                                <?= htmlspecialchars($post['due_date']) ?>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        Due Date
+                                                    </label>
 
-                            </p>
+                                                    <input
+                                                        type="datetime-local"
+                                                        name="due_date"
+                                                        class="form-control"
+                                                        value="<?= !empty($post['due_date']) ? date('Y-m-d\TH:i', strtotime($post['due_date'])) : '' ?>">
+                                                </div>
 
-                        <?php endif; ?>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        Points
+                                                    </label>
 
-                        <!-- ATTACHMENTS -->
+                                                    <input
+                                                        type="number"
+                                                        name="points"
+                                                        class="form-control"
+                                                        min="0"
+                                                        max="100"
+                                                        value="<?= htmlspecialchars($post['max_score'] ?? 100) ?>">
+                                                </div>
 
-                        <?php if (!empty($post['file_paths'])): ?>
-
-                            <?php
-                            $filePaths = explode('||', $post['file_paths']);
-                            $fileNames = explode('||', $post['file_names']);
-                            $fileTypes = explode('||', $post['attachment_types']);
-                            ?>
-
-                            <div class="mt-3">
-                                <strong>Attachments:</strong>
-
-                                <ul class="list-group mt-2">
-
-                                    <?php foreach ($filePaths as $i => $path): ?>
-
-                                        <?php
-                                        $name = $fileNames[$i] ?? 'file';
-                                        $type = $fileTypes[$i] ?? 'other';
-                                        $url = "/NewSite/" . $path;
-                                        ?>
-
-                                        <li class="list-group-item">
-
-                                            <?php if ($type === 'jpg' || $type === 'jpeg' || $type === 'png'): ?>
-                                                <img src="<?= $url ?>" style="max-width:200px;">
                                             <?php endif; ?>
 
-                                            <a href="<?= $url ?>" target="_blank">
-                                                📎 <?= htmlspecialchars($name) ?>
-                                            </a>
+                                        </div>
 
-                                        </li>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
 
-                                    <?php endforeach; ?>
+                                            <button type="submit" name="edit_post" class="btn btn-primary">
+                                                Save Changes
+                                            </button>
+                                        </div>
 
-                                </ul>
+                                    </form>
 
+                                </div>
                             </div>
-
-
-                        <?php endif; ?>
-                        <?php if ($isTeacher || $post['postedBy'] == $user['user_id']): ?>
-                            <a href="class.php?class_id=<?= $class_id ?>&delete_post=<?= $post['post_id'] ?>"
-                                class="btn btn-danger btn-sm"
-                                onclick="return confirm('Delete this post?')">
-                                🗑 Delete
-                            </a>
                         <?php endif; ?>
 
-                    </div>
-                    </a>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
 
                 </div>
+
                 <!-- STUDENT SECTION -->
                 <div id="studentSection" style="display:none;">
+
                     <div class="card p-3 shadow-sm mb-3 flex-column flex-md-row align-items-md-center gap-3">
-                            <strong>
-                                <?php
-                                $teacher = $classModel->getTeacher($class_id);
-                                echo htmlspecialchars(ucfirst($teacher['first_name'] ?? '')) . ' ' . htmlspecialchars(ucfirst($teacher['last_name'] ?? ''));
-                                ?>
-                            </strong>
+                        <strong>
+                            <?php
+                            $teacher = $classModel->getTeacher($class_id);
+                            echo htmlspecialchars(ucfirst($teacher['first_name'] ?? '')) . ' ' . htmlspecialchars(ucfirst($teacher['last_name'] ?? ''));
+                            ?>
+                        </strong>
 
-                            <span class="badge bg-success">
-                                Teacher
-                            </span>
+                        <span class="badge bg-success">
+                            Teacher
+                        </span>
+                    </div>
 
-                    </div>        
                     <div class="card p-3 shadow-sm">
-                        
+
                         <h4 class="mb-4">Students</h4>
 
                         <?php if (count($students) > 0): ?>
@@ -531,16 +769,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
     </main>
 
     <!-- Announcement modal -->
-    
     <div class="modal fade" id="announcement" tabindex="-1" aria-labelledby="announcementLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
+
             <form method="POST" enctype="multipart/form-data" class="modal-content">
+
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="announcementLabel">New Announcement</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
+
                     <div class="mb-3">
                         <label class="form-label" for="announcementTitle">Title</label>
                         <input type="text" id="announcementTitle" name="title" class="form-control" required>
@@ -551,34 +791,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         <textarea id="announcementDescription" name="description" class="form-control" rows="4" required></textarea>
                     </div>
 
-                    <div class="upload-section" id="uploadSection">
-                        <div class="file-input-area" id="dropZone">
+                    <div class="upload-section">
+                        <div class="file-input-area">
                             <div class="upload-icon">📁</div>
                             <div>Click or drag & drop files</div>
                             <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
-                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg" id="fileInput">
+                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg,.png">
                         </div>
-                        <div id="fileList" class="file-list mt-3"></div>
+
+                        <div class="file-list mt-3"></div>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="create_announcement" class="btn btn-primary">Post Announcement</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" name="create_announcement" class="btn btn-primary">
+                        Post Announcement
+                    </button>
                 </div>
+
             </form>
+
         </div>
     </div>
 
+    <!-- Assignment modal -->
     <div class="modal fade" id="assignment" tabindex="-1" aria-labelledby="assignmentLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
+
             <form method="POST" enctype="multipart/form-data" class="modal-content">
+
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="assignmentLabel">New assignment</h1>
+                    <h1 class="modal-title fs-5" id="assignmentLabel">New Assignment</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
+
                     <div class="mb-3">
                         <label class="form-label" for="assignmentTitle">Title</label>
                         <input type="text" id="assignmentTitle" name="title" class="form-control" required>
@@ -588,33 +841,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         <label class="form-label" for="assignmentDescription">Description</label>
                         <textarea id="assignmentDescription" name="description" class="form-control" rows="4" required></textarea>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label" for="assignmentDueDate">Due Date</label>
                         <input type="datetime-local" id="assignmentDueDate" name="due_date" class="form-control" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label" for="assignmentPoints">Points</label>
-                        <input type="number" id="assignmentPoints" name="points" class="form-control" min="0" max="100" default="0" required>
+                        <input type="number" id="assignmentPoints" name="points" class="form-control" min="0" max="100" value="0" required>
                     </div>
-                    <div class="upload-section" id="uploadSection">
-                        <div class="file-input-area" id="dropZone">
+
+                    <div class="upload-section">
+                        <div class="file-input-area">
                             <div class="upload-icon">📁</div>
                             <div>Click or drag & drop files</div>
                             <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
-                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg" id="fileInput">
+                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg,.png">
                         </div>
-                        <div id="fileList" class="file-list mt-3"></div>
+
+                        <div class="file-list mt-3"></div>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="create_assignment" class="btn btn-primary">Post Assignment</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" name="create_assignment" class="btn btn-primary">
+                        Post Assignment
+                    </button>
                 </div>
+
             </form>
+
         </div>
     </div>
-                        
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/upload.js"></script>
     <script src='../js/animate.js'></script>
@@ -628,7 +893,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
         const streamSection = document.getElementById('streamSection');
         const studentSection = document.getElementById('studentSection');
 
-        streamBtn.addEventListener('click', function () {
+        streamBtn.addEventListener('click', function() {
             streamSection.style.display = 'block';
             studentSection.style.display = 'none';
 
@@ -636,7 +901,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
             studentBtn.classList.remove('active');
         });
 
-        studentBtn.addEventListener('click', function () {
+        studentBtn.addEventListener('click', function() {
             streamSection.style.display = 'none';
             studentSection.style.display = 'block';
 
@@ -644,6 +909,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
             streamBtn.classList.remove('active');
         });
     </script>
+
 </body>
 
 </html>
