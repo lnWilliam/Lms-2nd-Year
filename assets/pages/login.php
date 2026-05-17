@@ -1,23 +1,19 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
 
-/**
- * Login and registration page. Handles form submission through UserController.
- */
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
-
 session_start();
 require_once "../../vendor/autoload.php";
+
+if (isset($_SESSION['logged'])) {
+    header('Location: home.php');
+}
 
 use App\Controllers\UserController;
 use App\Helpers\Database;
 use App\Models\UserModel;
-
-if (isset($_SESSION['logged'])) {
-    header('Location: home.php');
-    exit;
-}
 
 $database = Database::getInstance();
 $model = new UserModel($database);
@@ -25,12 +21,11 @@ $controller = new UserController($model);
 
 $message = '';
 $messageType = '';
-$result = null;
 
-if ($_SERVER['REQUEST_METHOD'] === "POST") {
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (isset($_POST['signup'])) {
         $data = [
-            "username" => $_POST["username"] ?? '',
+            "username" => $_POST["username"],
             "email" => $_POST["email"] ?? '',
             "password" => $_POST["password"] ?? '',
             "confirm_pass" => $_POST["confirm_pass"] ?? '',
@@ -43,34 +38,28 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
     if (isset($_POST['login'])) {
         $data = [
-            "user_username" => $_POST["user_username"] ?? '',
+            "user_username" => $_POST["user_username"],
             "user_password" => $_POST["user_password"] ?? ''
         ];
-
         $result = $controller->validateAndProcessLogin($data);
+     
     }
-
-    if ($result !== null) {
-        if (isset($result['logged_in'])) {
-            $_SESSION['success'] = 'User Logged in';
-            $_SESSION['user_data'] = $result['data'];
-            $_SESSION['logged'] = true;
-            header('Location: home.php');
-            exit;
-        }
-
-        if (!empty($result['success'])) {
-            $_SESSION['success'] = "User registered successfully!";
-            $_SESSION['user_data'] = $result['data'];
-        } else {
-            $_SESSION['error'] = implode('<br>', $result['errors']);
-        }
+    if (isset($result['logged_in'])) {
+        $_SESSION['success'] = 'User Logged in';
+        $_SESSION['user_data'] = $result['data'];
+        $_SESSION['logged'] = true;
+        header('Location: home.php');
+        exit;
+    } elseif ($result['success']) {
+        $_SESSION['success'] = "User registered successfully!";
+        $_SESSION['user_data'] = $result['data'];
+    } else {
+        $_SESSION['error'] = implode('<br>', $result['errors']);
     }
-
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
-
+// Get session messages
 if (isset($_SESSION['success'])) {
     $message = $_SESSION['success'];
     $messageType = 'success';
@@ -88,39 +77,57 @@ if (isset($_SESSION['success'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduRift Login</title>
+    <title>Document</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <style>
-    body{display: flex; flex-direction: column; align-items: center; justify-content: center; }
-</style>
-<body>
+    body {
+        flex-direction: column;
+    }
 
+    .message {
+        width: 900px;
+        border: 1px solid black;
+        border-radius: 10px;
+        height: fit-content;
+        text-align: center;
+    }
+
+    .error {
+        background-color: red;
+        color: white;
+    }
+
+    .success {
+        background-color: green;
+        color: white
+    }
+</style>
+
+<body>
+    <button><a href="home.html">Home</a></button>
     <?php if ($message): ?>
-        <div class="message <?php echo htmlspecialchars($messageType); ?>">
+        <div class="message <?php echo $messageType; ?>">
             <?php echo $message; ?>
         </div>
     <?php endif; ?>
-
     <div class="container">
         <input type="checkbox" id="toggle" hidden>
 
         <!-- LOGIN -->
         <div class="panel leftPanel">
             <h2>Login</h2>
-            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST" id="loginForm">
+            <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" id='loginForm'>
                 <div class="input-box">
-                    <input type="text" name="user_username" id="user_username" required placeholder=" ">
-                    <label for="user_username">Username</label>
+                    <input type="text" name="user_username" required>
+                    <label>Username</label>
                 </div>
 
-                <div class="input-box password-box">
-                    <input type="password" name="user_password" id="login_password" required placeholder=" ">
-                    <label for="login_password">Password</label>
-                    <button type="button" class="toggle-password" data-target="login_password" aria-label="Show password">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+                <div class="input-box">
+                    <input type="password" name="user_password" required>
+                    <label>Password</label>
                 </div>
 
                 <button type="submit" name="login">Login</button>
@@ -143,43 +150,46 @@ if (isset($_SESSION['success'])) {
         <!-- SIGNUP -->
         <div class="panel rightPanel">
             <h2>Sign Up</h2>
-            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST" id="registrationForm">
+            <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" id="registrationForm">
                 <div class="input-box">
-                    <input type="text" name="username" id="username" required placeholder=" " pattern="^[a-zA-Z][a-zA-Z0-9_.]*$" title="Username must start with a letter and can only contain letters, numbers, underscores and dots">
-                    <label for="username">Username</label>
+                    <input type="text"
+                        name="username"
+                        id="username"
+                        required
+                        pattern="^[a-zA-Z][a-zA-Z0-9_.]*$"
+                        title="Username must start with a letter and can only contain letters, numbers, underscores and dots">
+                    <label>Username</label>
                     <div id="usernameStatus" class="username-status"></div>
+
                 </div>
 
                 <div class="input-box">
-                    <input type="text" name="first_name" id="firstName" required placeholder=" ">
-                    <label for="firstName">First Name</label>
+                    <input type="text" name="first_name" required>
+                    <label>First Name</label>
                 </div>
 
                 <div class="input-box">
-                    <input type="text" name="last_name" id="lastName" required placeholder=" ">
-                    <label for="lastName">Last Name</label>
+                    <input type="text" name="last_name" required>
+                    <label>Last Name</label>
                 </div>
 
                 <div class="input-box">
-                    <input type="email" name="email" id="email" required placeholder=" ">
-                    <label for="email">Email</label>
-                    <div id="emailStatus" class="email-status"></div>
+                    <input type="email"
+                        name="email"
+                        id="email"
+                        required>
+                    <label>Email</label>
+                    <div id="emailStatus" class="username-status"></div>
                 </div>
 
-                <div class="input-box password-box">
-                    <input type="password" name="password" id="password" required placeholder=" ">
-                    <label for="password">Password</label>
-                    <button type="button" class="toggle-password" data-target="password" aria-label="Show password">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+                <div class="input-box">
+                    <input type="password" name="password" id='password' required>
+                    <label>Password</label>
                 </div>
 
-                <div class="input-box password-box">
-                    <input type="password" name="confirm_pass" id="confirm_pass" required placeholder=" ">
-                    <label for="confirm_pass">Confirm Password</label>
-                    <button type="button" class="toggle-password" data-target="confirm_pass" aria-label="Show confirm password">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+                <div class="input-box">
+                    <input type="password" name="confirm_pass" id="confirm_pass" required>
+                    <label>Confirm Password</label>
                     <p class="confirm_error unavailable"></p>
                 </div>
 
@@ -187,8 +197,9 @@ if (isset($_SESSION['success'])) {
                 <label for="toggle" class="switch">Already have account?</label>
             </form>
         </div>
+
     </div>
-    <script src="../js/user.js"></script>
+    <script src='../js/user.js'></script>
 </body>
 
 </html>

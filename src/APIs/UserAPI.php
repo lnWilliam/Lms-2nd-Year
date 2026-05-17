@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
 namespace App\APIs;
 
 require_once "../../vendor/autoload.php";
@@ -10,25 +12,12 @@ use App\Controllers\UserController;
 use App\Controllers\ClassController;
 
 
-/**
- * Handles JSON API requests for username, email, and class-name validation. This API keeps asynchronous form validation separate from page rendering so screens can give immediate feedback without duplicating controller rules.
- *
- * @package App\APIs
- * @author Charlo Marco
- * @since 2026-05-17
- */
 class UserAPI {
     private $userController;
     private $userModel;
     private $classController;
     private $classModel;
 
-    /**
-     * Initializes the object with the dependencies it needs to perform its responsibility.
-     *
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function __construct() {
         $database = Database::getInstance();
         $this->userModel = new UserModel($database);
@@ -37,12 +26,6 @@ class UserAPI {
         $this->classController = new ClassController($this->classModel);
     }
 
-    /**
-     * Routes the incoming JSON API request to the correct validation action and returns a JSON response.
-     *
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function handleRequest() {
         header('Content-Type: application/json');
         
@@ -86,12 +69,6 @@ class UserAPI {
 
             }
     }
-     /**
-      * Validates a class name from the JSON request so the UI can show immediate class-name feedback.
-      *
-      * @return void No value is returned.
-      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-      */
      private function checkClassName() {
         $input = json_decode(file_get_contents('php://input'), true);
         $className = $input['class_name'] ?? '';
@@ -114,12 +91,6 @@ class UserAPI {
         ]);
     }
 
-    /**
-     * Validates a username and checks database availability for live registration feedback.
-     *
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     private function checkUsername() {
         $input = json_decode(file_get_contents('php://input'), true);
         $username = $input['username'] ?? '';
@@ -147,12 +118,6 @@ class UserAPI {
         ]);
     }
 
-    /**
-     * Validates an email address and checks database availability for live registration feedback.
-     *
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     private function checkEmail() {
         $input = json_decode(file_get_contents('php://input'), true);
         $email = $input['email'] ?? '';

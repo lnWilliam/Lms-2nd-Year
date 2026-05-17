@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -143,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     Save Changes
                                 </button>
 
-                                <a href="class.php?class_id=<?= htmlspecialchars($class_id) ?>" class="btn btn-secondary">
+                                <a href="class.php?class_id=<?= htmlspecialchars((string) $class_id) ?>" class="btn btn-secondary">
                                     Cancel
                                 </a>
                             </div>

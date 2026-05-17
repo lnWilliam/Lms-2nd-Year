@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
 session_start();
 require_once "../../vendor/autoload.php";
 
@@ -11,6 +13,7 @@ if (!isset($_SESSION['user_data'])) {
 }
 
 $user = $_SESSION['user_data'];
+$user_id = (int) ($user['user_id'] ?? 0); // EDITED: cast session ID to int for strict-types-safe model/controller calls.
 $database = Database::getInstance();
 $classModel = new ClassModel($database);
 
@@ -18,7 +21,7 @@ if (!isset($_GET['post_id'])) {
     die('No assignment selected.');
 }
 
-$post_id = (int) $_GET['post_id'];
+$post_id = (int) $_GET['post_id']; // EDITED: $_GET values are strings, so cast to int for strict types.
 $assignment = $classModel->getAssignmentByPostId($post_id);
 
 if (!$assignment) {
@@ -26,7 +29,7 @@ if (!$assignment) {
 }
 
 $class_id = (int) $assignment['class_id'];
-$classes = $classModel->getClassesByUser($user['user_id']);
+$classes = $classModel->getClassesByUser($user_id);
 $currentClass = null;
 
 foreach ($classes as $c) {
@@ -58,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_grade'])) {
     } elseif ((float)$grade < 0 || (float)$grade > (float)$assignment['max_score']) {
         $_SESSION['assignment_error'] = 'Grade must be between 0 and ' . $assignment['max_score'] . '.';
     } else {
-        $saved = $classModel->saveStudentGrade($class_id, $student_id, $assignment['activity_id'], $grade);
+        $saved = $classModel->saveStudentGrade($class_id, $student_id, (int) $assignment['activity_id'], $grade);
         $_SESSION[$saved ? 'assignment_success' : 'assignment_error'] = $saved ? 'Grade saved successfully.' : 'Unable to save grade.';
     }
 
@@ -74,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['turn_in_assignment'])
 
     $result = $classModel->submitAssignmentFiles(
         $class_id,
-        $user['user_id'],
-        $assignment['activity_id'],
+        $user_id,
+        (int) $assignment['activity_id'],
         $_FILES['submission_files'] ?? []
     );
 
@@ -95,11 +98,11 @@ if (isset($_SESSION['assignment_success'])) {
 }
 
 $gradeRows = $isTeacher
-    ? $classModel->getAssignmentGrades($class_id, $assignment['activity_id'])
+    ? $classModel->getAssignmentGrades($class_id, (int) $assignment['activity_id'])
     : [];
 
 $mySubmission = !$isTeacher
-    ? $classModel->getStudentSubmission($class_id, $user['user_id'], $assignment['activity_id'])
+    ? $classModel->getStudentSubmission($class_id, $user_id, (int) $assignment['activity_id'])
     : null;
 
 $myFiles = (!$isTeacher && $mySubmission && !empty($mySubmission['submission_id']))
@@ -204,7 +207,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                         <ul class="list-group list-group-flush">
                             <?php foreach ($teacherAttachments as $file): ?>
                                 <li class="list-group-item bg-transparent px-0">
-                                    <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                    <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
                                         📎 <?= htmlspecialchars($file['file_name']) ?>
                                     </a>
                                 </li>
@@ -232,7 +235,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                             <ul class="list-group list-group-flush mb-3">
                                 <?php foreach ($myFiles as $file): ?>
                                     <li class="list-group-item bg-transparent px-0">
-                                        <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                        <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
                                             📄 <?= htmlspecialchars($file['file_name']) ?>
                                         </a>
                                     </li>
@@ -273,7 +276,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                     </thead>
                                     <tbody>
                                         <?php foreach ($gradeRows as $row): ?>
-                                            <?php $studentFiles = $classModel->getSubmissionFilesByStudent($class_id, $row['user_id'], $assignment['activity_id']); ?>
+                                            <?php $studentFiles = $classModel->getSubmissionFilesByStudent($class_id, $row['user_id'], (int) $assignment['activity_id']); ?>
                                             <tr>
                                                 <td>
                                                     <strong><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></strong>
@@ -291,7 +294,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                                     <?php if (!empty($studentFiles)): ?>
                                                         <?php foreach ($studentFiles as $file): ?>
                                                             <div class="mb-1">
-                                                                <a href="viewer.php?file=<?= urlencode($file['file_path']) ?>" target="_blank" class="attachment-link">
+                                                                <a href="<?= htmlspecialchars($file['file_path']) ?>" target="_blank" class="attachment-link">
                                                                     📄 <?= htmlspecialchars($file['file_name']) ?>
                                                                 </a>
                                                             </div>

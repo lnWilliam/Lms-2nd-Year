@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
 session_start();
 if (!isset($_SESSION["user_data"])) {
     header('Location: ../../logout.php');

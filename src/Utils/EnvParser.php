@@ -1,14 +1,8 @@
 <?php
+declare(strict_types=1);
 // EnvParser.php
 namespace App\Utils;
 
-/**
- * Loads environment variables from the project .env file. This utility keeps database configuration outside source code while making values available to the application.
- *
- * @package App\Utils
- * @author Charlo Marco
- * @since 2026-05-17
- */
 class EnvParser
 {
     private $variables = [];
@@ -18,13 +12,6 @@ class EnvParser
      * 
      * @param string $path Path to .env file
      * @throws Exception If file not found
-     */
-    /**
-     * Loads a .env file and registers its values for application configuration.
-     *
-     * @param mixed $path Path to the .env file.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
     public function load($path)
     {
@@ -51,13 +38,6 @@ class EnvParser
      * Parse a single line from .env file
      * 
      * @param string $line
-     */
-    /**
-     * Parses one .env line so key/value pairs can be stored and exported.
-     *
-     * @param mixed $line Line from the .env file.
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
     private function parseLine($line)
     {
@@ -89,13 +69,6 @@ class EnvParser
      * @param string $value
      * @return string
      */
-    /**
-     * Normalizes an environment value by removing wrapping quotes and decoding escapes.
-     *
-     * @param mixed $value Environment value to sanitize.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     private function sanitizeValue($value)
     {
         // Remove surrounding quotes
@@ -121,14 +94,6 @@ class EnvParser
      * @param mixed $default
      * @return mixed
      */
-    /**
-     * Reads one environment value with an optional fallback.
-     *
-     * @param mixed $key Environment variable key to read.
-     * @param mixed $default Fallback value returned when the key is missing.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function get($key, $default = null)
     {
         return $this->variables[$key] ?? $default;
@@ -138,12 +103,6 @@ class EnvParser
      * Get all variables
      * 
      * @return array
-     */
-    /**
-     * Returns all parsed environment variables for configuration inspection.
-     *
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
     public function all()
     {

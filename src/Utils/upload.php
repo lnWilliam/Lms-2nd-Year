@@ -1,25 +1,15 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
+
 namespace App\Utils;
 
-/**
- * Handles file upload validation, storage naming, and file deletion. This utility keeps filesystem operations reusable and separate from page logic.
- *
- * @package App\Utils
- * @author Charlo Marco
- * @since 2026-05-17
- */
 class Upload
 {
     private $uploadDir;
     private $maxFileSize;
     private $allowedExts;
 
-    /**
-     * Initializes the object with the dependencies it needs to perform its responsibility.
-     *
-     * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function __construct()
     {
         $this->uploadDir = "documents/";
@@ -38,13 +28,6 @@ class Upload
         }
     }
 
-    /**
-     * Validates and moves multiple post attachment files into storage.
-     *
-     * @param array $files Uploaded files array from the request.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function multiUpload($files)
     {
         $uploadedFiles = [];
@@ -108,13 +91,6 @@ class Upload
         return $uploadedFiles;
     }
 
-    /**
-     * Maps a file extension to a general attachment type for display and storage.
-     *
-     * @param mixed $ext File extension to classify.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     private function detectType($ext)
     {
         switch ($ext) {
@@ -136,13 +112,6 @@ class Upload
         }
     }
 
-    /**
-     * Deletes a physical file from storage when a post or submission is removed.
-     *
-     * @param mixed $filePath Physical path of the file to delete.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
     public function deleteFile($filePath)
     {
         if (file_exists($filePath)) {
