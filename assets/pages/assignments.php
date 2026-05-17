@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
 
 session_start();
 require_once "../../vendor/autoload.php";
@@ -13,7 +12,7 @@ if (!isset($_SESSION['user_data'])) {
 }
 
 $user = $_SESSION['user_data'];
-$user_id = (int) ($user['user_id'] ?? 0); // EDITED: cast session ID to int for strict-types-safe model/controller calls.
+$user_id = (int) ($user['user_id'] ?? 0); 
 $database = Database::getInstance();
 $classModel = new ClassModel($database);
 
@@ -21,7 +20,7 @@ if (!isset($_GET['post_id'])) {
     die('No assignment selected.');
 }
 
-$post_id = (int) $_GET['post_id']; // EDITED: $_GET values are strings, so cast to int for strict types.
+$post_id = (int) $_GET['post_id'];
 $assignment = $classModel->getAssignmentByPostId($post_id);
 
 if (!$assignment) {

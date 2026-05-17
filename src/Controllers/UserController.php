@@ -6,12 +6,13 @@ namespace App\Controllers;
 
 use App\Helpers\Sanitizer;
 use App\Helpers\Validator;
+use App\Models\UserModel;
 
 class UserController
 {
-    private $user;
+    private UserModel $user;
 
-    public function __construct($user)
+    public function __construct(UserModel $user)
     {
         $this->user = $user;
     }
@@ -19,7 +20,7 @@ class UserController
     /**
      * Validate and sanitize user input for registration
      */
-    public function validateAndProcessLogin($input)
+    public function validateAndProcessLogin(array $input): array
     {
         Validator::clearErrors();
         $fieldTypes = [
@@ -55,7 +56,7 @@ class UserController
     }
 
     
-    public function validateAndProcessRegistration($input)
+    public function validateAndProcessRegistration(array $input): array
     {
         Validator::clearErrors();
 
@@ -141,7 +142,7 @@ class UserController
     /**
      * Validate username only (for API)
      */
-    public function validateUsernameOnly($username)
+    public function validateUsernameOnly(string $username): array
     {
         Validator::clearErrors();
 
@@ -165,7 +166,7 @@ class UserController
     }
     
 
-    public function validateEmailOnly($email)
+    public function validateEmailOnly(string $email): array
     {
         Validator::clearErrors();
 

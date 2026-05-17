@@ -6,9 +6,9 @@ namespace App\Utils;
 
 class Upload
 {
-    private $uploadDir;
-    private $maxFileSize;
-    private $allowedExts;
+    private string $uploadDir;
+    private int $maxFileSize;
+    private array $allowedExts;
 
     public function __construct()
     {
@@ -28,7 +28,7 @@ class Upload
         }
     }
 
-    public function multiUpload($files)
+    public function multiUpload(array $files): array
     {
         $uploadedFiles = [];
 
@@ -91,7 +91,7 @@ class Upload
         return $uploadedFiles;
     }
 
-    private function detectType($ext)
+    private function detectType(string $ext): string
     {
         switch ($ext) {
 
@@ -112,7 +112,7 @@ class Upload
         }
     }
 
-    public function deleteFile($filePath)
+    public function deleteFile(string $filePath): bool
     {
         if (file_exists($filePath)) {
             return unlink($filePath);

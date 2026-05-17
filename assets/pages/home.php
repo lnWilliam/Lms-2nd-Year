@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+declare(strict_types=1); 
 
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
@@ -235,11 +235,6 @@ if (isset($_SESSION['success'])) {
         }
       }
       ?>
-      <a href="progress.php"><span class="nav-ico" aria-hidden="true">◎</span> Progress</a>
-      <a href="assignments.php"><span class="nav-ico" aria-hidden="true">✎</span> Assignments</a>
-      <a href="certificates.php"><span class="nav-ico" aria-hidden="true">★</span> Certificates</a>
-      <p class="sidebar-label" style="margin-top:1rem">Account</p>
-      <a href="settings.php"><span class="nav-ico" aria-hidden="true">⚙</span> Settings</a>
     </aside>
 
     <!-- MAIN -->

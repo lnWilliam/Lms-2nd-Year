@@ -1,20 +1,38 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
-
-
+declare(strict_types=1);
 namespace App\Models;
 
 use PDO;
 
+/**
+ * Handles database operations for user account records and profile records. This model keeps account queries separate from controllers so registration and login use a consistent data layer.
+ *
+ * @package App\Models
+ * @author Charlo Marco
+ * @since 2026-05-17
+ */
 class UserModel
 {
     private $conn;
 
+    /**
+     * Initializes the object with the dependencies it needs to perform its responsibility.
+     *
+     * @param mixed $database Database helper used to obtain the PDO connection.
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function __construct($database)
     {
         $this->conn = $database->getConnection();
     }
 
+    /**
+     * Retrieves all account records for administrative listing or debugging use.
+     *
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function selectAll()
     {
         try {
@@ -36,6 +54,13 @@ class UserModel
         }
     }
 
+    /**
+     * Retrieves one account by account ID so callers can load a specific user record.
+     *
+     * @param mixed $id Account identifier.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getUser($id)
     {
         try {
@@ -50,6 +75,13 @@ class UserModel
         }
     }
 
+    /**
+     * Retrieves account and profile data by username for login verification.
+     *
+     * @param mixed $username Username value to check or validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function getUserByUsername($username)
     {
         try {
@@ -75,6 +107,13 @@ class UserModel
         }
     }
 
+    /**
+     * Updates basic account fields so profile changes are saved consistently.
+     *
+     * @param array $data Associative array of values required by the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function updateUser($data)
     {
         try {
@@ -95,6 +134,13 @@ class UserModel
         }
     }
 
+    /**
+     * Creates both the Account and Users records inside one transaction so registration stays consistent.
+     *
+     * @param array $data Associative array of values required by the operation.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function insert($data)
     {
         try {
@@ -138,6 +184,13 @@ class UserModel
         }
     }
 
+    /**
+     * Deletes an account record so related profile data can cascade according to the database schema.
+     *
+     * @param mixed $id Account identifier.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function deleteUser($id)
     {
         try {
@@ -151,6 +204,13 @@ class UserModel
         }
     }
 
+    /**
+     * Checks whether a username is unused before registration accepts it.
+     *
+     * @param mixed $username Username value to check or validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function checkUsernameAvailability($username)
     {
         try {
@@ -165,6 +225,13 @@ class UserModel
         }
     }
 
+    /**
+     * Checks whether an email address is unused before registration accepts it.
+     *
+     * @param mixed $email Email address value to check or validate.
+     * @return mixed Operation result used by the caller.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function checkEmailAvailability($email)
     {
         try {

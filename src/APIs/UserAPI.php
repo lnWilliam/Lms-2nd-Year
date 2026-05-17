@@ -13,10 +13,10 @@ use App\Controllers\ClassController;
 
 
 class UserAPI {
-    private $userController;
-    private $userModel;
-    private $classController;
-    private $classModel;
+    private UserController $userController;
+    private UserModel $userModel;
+    private ClassController $classController;
+    private ClassModel $classModel;
 
     public function __construct() {
         $database = Database::getInstance();
@@ -26,7 +26,7 @@ class UserAPI {
         $this->classController = new ClassController($this->classModel);
     }
 
-    public function handleRequest() {
+    public function handleRequest(): void {
         header('Content-Type: application/json');
         
         // Handle CORS if needed
@@ -69,7 +69,7 @@ class UserAPI {
 
             }
     }
-     private function checkClassName() {
+     private function checkClassName(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         $className = $input['class_name'] ?? '';
         
@@ -91,7 +91,7 @@ class UserAPI {
         ]);
     }
 
-    private function checkUsername() {
+    private function checkUsername(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         $username = $input['username'] ?? '';
         
@@ -118,7 +118,7 @@ class UserAPI {
         ]);
     }
 
-    private function checkEmail() {
+    private function checkEmail(): void {
         $input = json_decode(file_get_contents('php://input'), true);
         $email = $input['email'] ?? '';
         

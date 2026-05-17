@@ -1,8 +1,5 @@
 <?php
-<<<<<<< HEAD
 declare(strict_types=1);
-=======
->>>>>>> refactor-oop
 session_start();
 require_once "../../vendor/autoload.php";
 
@@ -398,8 +395,4 @@ function renderEmptyState($message)
 <script src="../js/animate.js"></script>
 
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> refactor-oop

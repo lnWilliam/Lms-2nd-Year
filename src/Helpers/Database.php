@@ -11,8 +11,8 @@ $env = new EnvParser();
 $env->load(__DIR__ . '/../../.env');
 class Database {
 
-    private $conn;
-    private $config;
+    private \PDO $conn;
+    private array $config;
     private static ?Database $instance = null;
     
     public function __construct()
@@ -22,16 +22,16 @@ class Database {
     }
     
         // Clone prevention
-    private function __clone() {}
+    private function __clone(): void {}
     
     // Wakeup prevention (for unserialization)
-    public function __wakeup() {
+    public function __wakeup(): void {
         throw new RuntimeException("Cannot unserialize singleton");
     }
     /**
      * Load database configuration from environment
      */
-    private function loadConfig()
+    private function loadConfig(): void
     {
         $this->config = [
             'host' => getenv('DB_HOST') ?: 'localhost',
@@ -48,7 +48,7 @@ class Database {
             throw new \Exception("Database name and user are required in .env file");
         }
     }
-    private function connect()
+    private function connect(): void
     {
         try {
             $dsn = sprintf(
@@ -85,7 +85,7 @@ class Database {
     }
     
     
-    public function getConnection(){
+    public function getConnection(): \PDO {
         return $this->conn;
     }
     

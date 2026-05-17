@@ -6,17 +6,18 @@ namespace App\Controllers;
 
 use App\Helpers\Sanitizer;
 use App\Helpers\Validator;
+use App\Models\ClassModel;
 
 class ClassController
 {
-    private $classModel;
+    private ClassModel $classModel;
 
-    public function __construct($classModel)
+    public function __construct(ClassModel $classModel)
     {
         $this->classModel = $classModel;
     }
 
-    public function validateAndProcessClass($input)
+    public function validateAndProcessClass(array $input): array
     {
         Validator::clearErrors();
 
@@ -62,7 +63,7 @@ class ClassController
     }
 
 
-    public function validateClassNameOnly($className)
+    public function validateClassNameOnly(string $className): array
     {
         Validator::clearErrors();
 

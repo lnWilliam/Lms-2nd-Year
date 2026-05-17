@@ -4,12 +4,13 @@ declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statem
 namespace App\Helpers;
 
 class Validator {
-    private static $errors = [];
+    private static array $errors = [];
     
     /**
      * Validate username
      */
-    public static function validateUsername($username) {
+    public static function validateUsername(mixed $username): bool {
+        $username = (string) $username;
         if (empty($username)) {
             self::$errors[] = "Username is required";
             return false;
@@ -42,7 +43,8 @@ class Validator {
         return true;
     }
     
-    public static function validateClassName($className){
+    public static function validateClassName(mixed $className): bool {
+        $className = (string) $className;
         if (empty($className)) {
             self::$errors[] = "className is required";
             return false;
@@ -64,7 +66,8 @@ class Validator {
     /**
      * Validate email
      */
-    public static function validateEmail($email) {
+    public static function validateEmail(mixed $email): bool {
+        $email = (string) $email;
         if (empty($email)) {
             self::$errors[] = "Email is required";
             return false;
@@ -86,7 +89,11 @@ class Validator {
     /**
      * Validate password
      */
-    public static function validatePassword($password, $confirmPassword = null) {
+    public static function validatePassword(mixed $password, mixed $confirmPassword = null): bool {
+        $password = (string) $password;
+        if ($confirmPassword !== null) {
+            $confirmPassword = (string) $confirmPassword;
+        }
         if (empty($password)) {
             self::$errors[] = "Password is required";
             return false;
@@ -128,11 +135,11 @@ class Validator {
     /**
      * Validate required fields
      */
-    public static function validateRequired($data, $requiredFields) {
+    public static function validateRequired(array $data, array $requiredFields): bool {
         $missing = [];
         
         foreach ($requiredFields as $field) {
-            if (!isset($data[$field]) || empty(trim($data[$field]))) {
+            if (!isset($data[$field]) || empty(trim((string) $data[$field]))) {
                 $missing[] = $field;
             }
         }
@@ -148,21 +155,21 @@ class Validator {
     /**
      * Get all validation errors
      */
-    public static function getErrors() {
+    public static function getErrors(): array {
         return self::$errors;
     }
     
     /**
      * Clear errors
      */
-    public static function clearErrors() {
+    public static function clearErrors(): void {
         self::$errors = [];
     }
     
     /**
      * Check if there are any errors
      */
-    public static function hasErrors() {
+    public static function hasErrors(): bool {
         return !empty(self::$errors);
     }
 }

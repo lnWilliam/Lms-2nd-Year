@@ -5,18 +5,19 @@ declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statem
 namespace App\Models;
 
 use App\Utils\Upload;
+use App\Helpers\Database;
 use PDO;
 
 class ClassModel
 {
     private \PDO $conn;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
     }
 
-    public function createClass($user_id, $data)
+    public function createClass(int|string $user_id, array $data): bool
     {
         try {
             $this->conn->beginTransaction();
@@ -51,7 +52,7 @@ class ClassModel
         }
     }
 
-    public function checkClassCodeAvailability($classCode)
+    public function checkClassCodeAvailability(string $classCode): bool
     {
         $sql = "SELECT class_id FROM Classes WHERE class_code = ?";
         $stmt = $this->conn->prepare($sql);
@@ -59,7 +60,7 @@ class ClassModel
         return $stmt->rowCount() === 0;
     }
 
-    public function getClassesByUser($user_id)
+    public function getClassesByUser(int|string $user_id): array
     {
         try {
             $sql = "SELECT
@@ -84,7 +85,7 @@ class ClassModel
             return [];
         }
     }
-    public function getStudents($class_id)
+    public function getStudents(int|string $class_id): array
     {
         try {
             $sql = "SELECT
@@ -112,7 +113,7 @@ class ClassModel
         }
     }
 
-    public function removeStudentFromClass($class_id, $student_id)
+    public function removeStudentFromClass(int|string $class_id, int|string $student_id): bool
     {
         try {
             $sql = "DELETE FROM Class_User
@@ -131,7 +132,7 @@ class ClassModel
             return false;
         }
     }
-    public function joinClassByCode($user_id, $class_code)
+    public function joinClassByCode(int|string $user_id, string $class_code): array
     {
         try {
             $this->conn->beginTransaction();
@@ -185,7 +186,7 @@ class ClassModel
         }
     }
 
-    public function leaveClass($user_id, $class_id)
+    public function leaveClass(int|string $user_id, int|string $class_id): bool
     {
         try {
             $sql = "DELETE FROM Class_User WHERE class_id = ? AND user_id = ?";
@@ -198,7 +199,7 @@ class ClassModel
         }
     }
 
-    public function createPost($class_id, $postedBy, $type, $title, $description, $due_date = null)
+    public function createPost(int|string $class_id, int|string $postedBy, string $type, string $title, string $description, ?string $due_date = null): string|false
     {
         try {
             $sql = "INSERT INTO Post 
@@ -223,7 +224,7 @@ class ClassModel
         }
     }
 
-    public function createAnnouncement($class_id, $postedBy, $title, $description, $files = [])
+    public function createAnnouncement(int|string $class_id, int|string $postedBy, string $title, string $description, array $files = []): string|false
     {
         try {
 
@@ -298,7 +299,7 @@ class ClassModel
         }
     }
 
-    public function createAssignment($class_id, $postedBy, $title, $description, $due_date, $max_score = 100, $allow_late = false)
+    public function createAssignment(int|string $class_id, int|string $postedBy, string $title, string $description, ?string $due_date, int|string $max_score = 100, bool|int $allow_late = false): string|false
     {
         try {
             $post_id = $this->createPost(
@@ -332,7 +333,7 @@ class ClassModel
             return false;
         }
     }
-    public function createMaterial($class_id, $postedBy, $title, $description)
+    public function createMaterial(int|string $class_id, int|string $postedBy, string $title, string $description): string|false
     {
         try {
 
@@ -366,7 +367,7 @@ class ClassModel
             return false;
         }
     }
-    public function getTeacher($class_id)
+    public function getTeacher(int|string $class_id): array|false
     {
         try {
             $sql = "SELECT
@@ -389,7 +390,7 @@ class ClassModel
             return false;
         }
     }
-    public function getClassPosts($class_id)
+    public function getClassPosts(int|string $class_id): array
     {
         try {
 
@@ -435,7 +436,7 @@ class ClassModel
         }
     }
 
-    public function deletePost($post_id)
+    public function deletePost(int|string $post_id): bool
     {
         try {
             $this->conn->beginTransaction();
@@ -474,7 +475,7 @@ class ClassModel
         }
     }
 
-    public function addAttachment($post_id, $attachment_type, $file_path, $file_name)
+    public function addAttachment(int|string $post_id, string $attachment_type, string $file_path, string $file_name): bool
     {
         $sql = "INSERT INTO Attachment
                 (post_id, attachment_type, file_path, file_name)
@@ -490,7 +491,7 @@ class ClassModel
         ]);
     }
 
-    public function getPostOwner($post_id)
+    public function getPostOwner(int|string $post_id): array|false
     {
         try {
             $stmt = $this->conn->prepare("
@@ -508,7 +509,7 @@ class ClassModel
         }
     }
 
-    public function updatePost($post_id, $title, $description, $due_date = null, $max_score = null)
+    public function updatePost(int|string $post_id, string $title, string $description, ?string $due_date = null, int|string|null $max_score = null): bool
     {
         try {
             $this->conn->beginTransaction();
@@ -571,7 +572,7 @@ class ClassModel
             return false;
         }
     }
-    public function getAssignmentByPostId($post_id)
+    public function getAssignmentByPostId(int|string $post_id): array|false
     {
         try {
             $sql = "SELECT
@@ -600,7 +601,7 @@ class ClassModel
         }
     }
 
-    public function getPostAttachments($post_id)
+    public function getPostAttachments(int|string $post_id): array
     {
         try {
             $sql = "SELECT attachment_id, attachment_type, file_name, file_path
@@ -617,7 +618,7 @@ class ClassModel
         }
     }
 
-    public function getAssignmentGrades($class_id, $activity_id)
+    public function getAssignmentGrades(int|string $class_id, int|string $activity_id): array
     {
         try {
             $sql = "SELECT
@@ -656,7 +657,7 @@ class ClassModel
         }
     }
 
-    public function saveStudentGrade($class_id, $student_id, $activity_id, $grade)
+    public function saveStudentGrade(int|string $class_id, int|string $student_id, int|string $activity_id, int|float|string $grade): bool
     {
         try {
             $sql = "SELECT class_user_id
@@ -691,7 +692,7 @@ class ClassModel
         }
     }
 
-    public function getStudentSubmission($class_id, $student_id, $activity_id)
+    public function getStudentSubmission(int|string $class_id, int|string $student_id, int|string $activity_id): array|false
     {
         try {
             $sql = "SELECT
@@ -722,7 +723,7 @@ class ClassModel
         }
     }
 
-    public function submitAssignmentFiles($class_id, $student_id, $activity_id, $files)
+    public function submitAssignmentFiles(int|string $class_id, int|string $student_id, int|string $activity_id, array $files): array
     {
         try {
             $sql = "SELECT class_user_id
@@ -823,7 +824,7 @@ class ClassModel
         }
     }
 
-    public function getSubmissionFiles($submission_id)
+    public function getSubmissionFiles(int|string|null $submission_id): array
     {
         try {
             if (!$submission_id) {
@@ -844,7 +845,7 @@ class ClassModel
         }
     }
 
-    public function getSubmissionFilesByStudent($class_id, $student_id, $activity_id)
+    public function getSubmissionFilesByStudent(int|string $class_id, int|string $student_id, int|string $activity_id): array
     {
         try {
             $submission = $this->getStudentSubmission($class_id, $student_id, $activity_id);
@@ -860,7 +861,7 @@ class ClassModel
         }
     }
 
-    public function getClassForTeacher($class_id, $user_id)
+    public function getClassForTeacher(int|string $class_id, int|string $user_id): array|false
     {
         try {
             $sql = "SELECT
@@ -893,7 +894,7 @@ class ClassModel
         }
     }
 
-    public function updateClass($class_id, $user_id, $data)
+    public function updateClass(int|string $class_id, int|string $user_id, array $data): array
     {
         try {
             $class = $this->getClassForTeacher($class_id, $user_id);
@@ -954,7 +955,7 @@ class ClassModel
         }
     }
 
-    public function deleteClass($class_id, $user_id)
+    public function deleteClass(int|string $class_id, int|string $user_id): bool
     {
         try {
             $class = $this->getClassForTeacher($class_id, $user_id);
