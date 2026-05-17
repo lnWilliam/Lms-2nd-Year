@@ -3,7 +3,6 @@ CREATE DATABASE IF NOT EXISTS EduRIft_db;
 
 USE EduRIft_db;
 
-DROP TABLE IF EXISTS Material;
 DROP TABLE IF EXISTS Announcement;
 DROP TABLE IF EXISTS Activity;
 
@@ -51,7 +50,7 @@ CREATE TABLE Post (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     class_id INT NOT NULL,
     postedBy INT NOT NULL,
-    type ENUM('assignment','material','announcement') NOT NULL,
+    type ENUM('assignment','announcement') NOT NULL,
     title VARCHAR(255),
     description TEXT,
     due_date DATE NULL,
@@ -88,13 +87,7 @@ CREATE TABLE IF NOT EXISTS Submission(
 	ON UPDATE CASCADE
 );
 
-CREATE TABLE Material (
-    material_id INT AUTO_INCREMENT PRIMARY KEY,
-    post_id INT NOT NULL UNIQUE,
 
-    FOREIGN KEY (post_id) REFERENCES Post(post_id)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
 
 CREATE TABLE Announcement (
     announcement_id INT AUTO_INCREMENT PRIMARY KEY,

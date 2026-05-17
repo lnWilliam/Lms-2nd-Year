@@ -243,37 +243,6 @@ if (isset($_SESSION['success'])) {
         <h2>Welcome Back <?php echo isset($user) ? $user['first_name'] . " " . $user['last_name'] : "" ?>👋</h2>
         <p>Continue where you left off—your next lesson is a click away.</p>
         <div class="hero-meta">
-          <span class="lms-pill">This week: 3 due dates</span>
-          <span class="lms-pill">Streak: 5 days</span>
-        </div>
-      </div>
-
-      <!-- STATS -->
-
-      <div class="row g-3 mb-4">
-        <div class="col-md-3 stat-box">
-          <div class="card p-3 text-center shadow-sm">
-            <h3>6</h3>
-            <p>Active Courses</p>
-          </div>
-        </div>
-        <div class="col-md-3 stat-box">
-          <div class="card p-3 text-center shadow-sm">
-            <h3>78%</h3>
-            <p>Average Progress</p>
-          </div>
-        </div>
-        <div class="col-md-3 stat-box">
-          <div class="card p-3 text-center shadow-sm">
-            <h3>12</h3>
-            <p>Assignments</p>
-          </div>
-        </div>
-        <div class="col-md-3 stat-box">
-          <div class="card p-3 text-center shadow-sm">
-            <h3>3</h3>
-            <p>Certificates</p>
-          </div>
         </div>
       </div>
 
