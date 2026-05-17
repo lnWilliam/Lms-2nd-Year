@@ -376,7 +376,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Classwork</a>
+                    <a class="nav-link" href="classwork.php?class_id=<?= htmlspecialchars($class_id) ?>">
+                        Classwork
+                    </a>
                 </li>
 
                 <li class="nav-item">

@@ -10,7 +10,7 @@ const links = document.querySelectorAll('.sidebar a');
         function isInViewport(el) {
             const rect = el.getBoundingClientRect();
             return (
-                rect.top <= window.innerHeight * 0.85 &&
+                rect.top <= window.innerHeight * 0.9 &&
                 rect.bottom >= 0
             );
         }
