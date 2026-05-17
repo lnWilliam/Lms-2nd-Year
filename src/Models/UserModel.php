@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 
+use App\Helpers\Database;
 use PDO;
 
 /**
@@ -13,7 +14,7 @@ use PDO;
  */
 class UserModel
 {
-    private $conn;
+    private PDO $conn;
 
     /**
      * Initializes the object with the dependencies it needs to perform its responsibility.
@@ -22,7 +23,7 @@ class UserModel
      * @return void No value is returned.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->conn = $database->getConnection();
     }
@@ -33,7 +34,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function selectAll()
+    public function selectAll(): array
     {
         try {
             $sql = "SELECT * FROM Account ORDER BY account_id DESC";
@@ -61,7 +62,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function getUser($id)
+    public function getUser(int|string $id): array|false
     {
         try {
             $sql = "SELECT * FROM Account WHERE account_id = ?";
@@ -82,7 +83,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function getUserByUsername($username)
+    public function getUserByUsername(string $username): array|false
     {
         try {
             $sql = "SELECT
@@ -114,7 +115,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function updateUser($data)
+    public function updateUser(array $data): bool
     {
         try {
             $sql = "UPDATE Account
@@ -141,7 +142,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function insert($data)
+    public function insert(array $data): bool
     {
         try {
             $this->conn->beginTransaction();
@@ -191,7 +192,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function deleteUser($id)
+    public function deleteUser(int|string $id): bool
     {
         try {
             $sql = "DELETE FROM Account WHERE account_id = ?";
@@ -211,7 +212,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function checkUsernameAvailability($username)
+    public function checkUsernameAvailability(string $username): bool
     {
         try {
             $sql = "SELECT account_id FROM Account WHERE username = ?";
@@ -232,7 +233,7 @@ class UserModel
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function checkEmailAvailability($email)
+    public function checkEmailAvailability(string $email): bool
     {
         try {
             $sql = "SELECT account_id FROM Account WHERE email = ?";

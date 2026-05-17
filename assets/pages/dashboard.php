@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+declare(strict_types=1);
 
 session_start();
 $message = "";
@@ -16,4 +16,3 @@ if (isset($_SESSION['success'])) {
 }
 echo $message ,  $message_Type;
 
-?>

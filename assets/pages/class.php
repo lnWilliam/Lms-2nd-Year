@@ -15,7 +15,7 @@ if (!isset($_SESSION["user_data"])) {
 }
 
 $user = $_SESSION['user_data'];
-$user_id = (int) ($user['user_id'] ?? 0); 
+$user_id = (int) ($user['user_id'] ?? 0);
 
 // 🔌 DB
 $database = Database::getInstance();
@@ -26,7 +26,7 @@ if (!isset($_GET['class_id'])) {
     die("No class selected.");
 }
 
-$class_id = (int) $_GET['class_id']; 
+$class_id = (int) $_GET['class_id'];
 $upload = new Upload();
 
 // 📚 Get user classes
@@ -379,9 +379,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Classwork</a>
+                    <a class="nav-link" href="classwork.php?class_id=<?= htmlspecialchars($class_id) ?>">
+                        Classwork
+                    </a>
                 </li>
-
                 <li class="nav-item">
                     <button class="nav-link border-0 bg-transparent" type="button" id="getStudents">
                         Student

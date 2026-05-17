@@ -1,7 +1,5 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
-
-
+declare(strict_types=1);
 namespace App\Helpers;
 
 use RuntimeException;
@@ -9,12 +7,25 @@ use App\Utils\EnvParser;
 
 $env = new EnvParser();
 $env->load(__DIR__ . '/../../.env');
+/**
+ * Creates and manages the shared PDO database connection for the application. The class centralizes environment-based configuration and transaction helpers for models.
+ *
+ * @package App\Helpers
+ * @author Charlo Marco
+ * @since 2026-05-17
+ */
 class Database {
 
-    private \PDO $conn;
-    private array $config;
+    private $conn;
+    private $config;
     private static ?Database $instance = null;
     
+    /**
+     * Initializes the object with the dependencies it needs to perform its responsibility.
+     *
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function __construct()
     {
         $this->loadConfig();
@@ -22,16 +33,34 @@ class Database {
     }
     
         // Clone prevention
-    private function __clone(): void {}
+    /**
+     * Blocks cloning so the singleton connection manager cannot be duplicated unexpectedly.
+     *
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
+    private function __clone() {}
     
     // Wakeup prevention (for unserialization)
-    public function __wakeup(): void {
+    /**
+     * Blocks unserialization so the singleton connection manager cannot be duplicated unexpectedly.
+     *
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
+    public function __wakeup() {
         throw new RuntimeException("Cannot unserialize singleton");
     }
     /**
      * Load database configuration from environment
      */
-    private function loadConfig(): void
+    /**
+     * Loads database settings from environment variables so credentials are not hard-coded.
+     *
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
+    private function loadConfig()
     {
         $this->config = [
             'host' => getenv('DB_HOST') ?: 'localhost',
@@ -48,7 +77,13 @@ class Database {
             throw new \Exception("Database name and user are required in .env file");
         }
     }
-    private function connect(): void
+    /**
+     * Creates the PDO connection used by the application models.
+     *
+     * @return void No value is returned.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
+    private function connect()
     {
         try {
             $dsn = sprintf(
@@ -77,6 +112,12 @@ class Database {
     }
     
     // Get the single instance
+    /**
+     * Returns the shared Database instance so the application uses one connection manager.
+     *
+     * @return Database Database singleton instance.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public static function getInstance(): Database {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -85,22 +126,52 @@ class Database {
     }
     
     
-    public function getConnection(): \PDO {
+    /**
+     * Returns the active PDO connection for model queries.
+     *
+     * @return \PDO PDO connection object.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
+    public function getConnection(){
         return $this->conn;
     }
     
+    /**
+     * Returns the last inserted database identifier for follow-up insert operations.
+     *
+     * @return string Last insert ID as a string.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function lastInsertId(): string {
         return $this->conn->lastInsertId();
     }
     
+    /**
+     * Starts a database transaction so related queries can succeed or fail together.
+     *
+     * @return bool True when the transaction starts successfully.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function beginTransaction(): bool {
         return $this->conn->beginTransaction();
     }
     
+    /**
+     * Commits the active database transaction after all related queries succeed.
+     *
+     * @return bool True when the transaction is committed successfully.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function commit(): bool {
         return $this->conn->commit();
     }
     
+    /**
+     * Rolls back the active transaction to avoid partial database changes after a failure.
+     *
+     * @return bool True when the transaction is rolled back successfully.
+     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     */
     public function rollBack(): bool {
         return $this->conn->rollBack();
     }

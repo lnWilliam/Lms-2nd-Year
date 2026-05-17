@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+declare(strict_types=1);
 
 error_reporting(E_ALL);
 ini_set('display_errors', '1');

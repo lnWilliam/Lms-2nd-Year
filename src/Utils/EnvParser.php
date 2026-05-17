@@ -12,7 +12,7 @@ namespace App\Utils;
  */
 class EnvParser
 {
-    private $variables = [];
+    private array $variables = [];
     
     /**
      * Load .env file and parse its contents
@@ -27,7 +27,7 @@ class EnvParser
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function load($path)
+    public function load(string $path): self
     {
         if (!file_exists($path)) {
             throw new \Exception(".env file not found at: " . $path);
@@ -60,7 +60,7 @@ class EnvParser
      * @return void No value is returned.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    private function parseLine($line)
+    private function parseLine(string $line): void
     {
         // Find first equals sign
         $equalsPos = strpos($line, '=');
@@ -97,7 +97,7 @@ class EnvParser
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    private function sanitizeValue($value)
+    private function sanitizeValue(string $value): string
     {
         // Remove surrounding quotes
         if (strlen($value) > 1) {
@@ -130,7 +130,7 @@ class EnvParser
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $this->variables[$key] ?? $default;
     }
@@ -146,7 +146,7 @@ class EnvParser
      * @return mixed Operation result used by the caller.
      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
      */
-    public function all()
+    public function all(): array
     {
         return $this->variables;
     }
