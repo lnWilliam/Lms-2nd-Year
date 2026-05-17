@@ -25,7 +25,7 @@ class Validator
      *
      * @param mixed $username Username value to validate.
      * @return bool True when the username passes all validation rules; otherwise false.
-     * @throws \Throwable If an unexpected runtime error occurs during validation.
+     
      */
     public static function validateUsername(mixed $username): bool
     {
@@ -70,7 +70,7 @@ class Validator
      *
      * @param mixed $className Class name value to validate.
      * @return bool True when the class name is valid; otherwise false.
-     * @throws \Throwable If an unexpected runtime error occurs during validation.
+     
      */
     public static function validateClassName(mixed $className): bool
     {
@@ -105,7 +105,7 @@ class Validator
      *
      * @param mixed $email Email value to validate.
      * @return bool True when the email is valid; otherwise false.
-     * @throws \Throwable If an unexpected runtime error occurs during validation.
+     
      */
     public static function validateEmail(mixed $email): bool
     {
@@ -138,7 +138,7 @@ class Validator
      * @param mixed $password Password value to validate.
      * @param mixed $confirmPassword Optional confirmation password value.
      * @return bool True when the password satisfies all strength and match rules; otherwise false.
-     * @throws \Throwable If an unexpected runtime error occurs during validation.
+     
      */
     public static function validatePassword(mixed $password, mixed $confirmPassword = null): bool
     {
@@ -192,7 +192,7 @@ class Validator
      * @param array $data Sanitized data keyed by field name.
      * @param array $requiredFields Field names that must be present and non-empty.
      * @return bool True when all required fields are present; otherwise false.
-     * @throws \Throwable If an unexpected runtime error occurs during validation.
+     
      */
     public static function validateRequired(array $data, array $requiredFields): bool
     {

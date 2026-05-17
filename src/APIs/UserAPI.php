@@ -29,7 +29,7 @@ class UserAPI {
      * Initializes the object with the dependencies it needs to perform its responsibility.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct() {
         $database = Database::getInstance();
@@ -43,7 +43,7 @@ class UserAPI {
      * Routes the incoming JSON API request to the correct validation action and returns a JSON response.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     * 
      */
     public function handleRequest() {
         header('Content-Type: application/json');
@@ -92,7 +92,7 @@ class UserAPI {
       * Validates a class name from the JSON request so the UI can show immediate class-name feedback.
       *
       * @return void No value is returned.
-      * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+      *
       */
      private function checkClassName() {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -120,7 +120,7 @@ class UserAPI {
      * Validates a username and checks database availability for live registration feedback.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     private function checkUsername() {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -153,7 +153,7 @@ class UserAPI {
      * Validates an email address and checks database availability for live registration feedback.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     private function checkEmail() {
         $input = json_decode(file_get_contents('php://input'), true);

@@ -25,7 +25,7 @@ class EnvParser
      *
      * @param mixed $path Path to the .env file.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     
      */
     public function load(string $path): self
     {
@@ -50,7 +50,7 @@ class EnvParser
     
     /**
      * Parse a single line from .env file
-     * 
+     *
      * @param string $line
      */
     /**
@@ -58,7 +58,7 @@ class EnvParser
      *
      * @param mixed $line Line from the .env file.
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     
      */
     private function parseLine(string $line): void
     {
@@ -86,7 +86,7 @@ class EnvParser
     
     /**
      * Sanitize value by removing quotes and processing escape characters
-     * 
+     *
      * @param string $value
      * @return string
      */
@@ -95,7 +95,7 @@ class EnvParser
      *
      * @param mixed $value Environment value to sanitize.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     
      */
     private function sanitizeValue(string $value): string
     {
@@ -117,7 +117,7 @@ class EnvParser
     
     /**
      * Get a variable value
-     * 
+     *
      * @param string $key
      * @param mixed $default
      * @return mixed
@@ -128,7 +128,7 @@ class EnvParser
      * @param mixed $key Environment variable key to read.
      * @param mixed $default Fallback value returned when the key is missing.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -137,14 +137,14 @@ class EnvParser
     
     /**
      * Get all variables
-     * 
+     *
      * @return array
      */
     /**
      * Returns all parsed environment variables for configuration inspection.
      *
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     
      */
     public function all(): array
     {

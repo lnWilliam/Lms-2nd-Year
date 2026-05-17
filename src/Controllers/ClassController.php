@@ -21,7 +21,7 @@ class ClassController
      *
      * @param mixed $classModel Class model used for class validation and persistence.
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct($classModel)
     {
@@ -33,7 +33,7 @@ class ClassController
      *
      * @param array $input Input data collected from a form or JSON request.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateAndProcessClass($input)
     {
@@ -86,7 +86,7 @@ class ClassController
      *
      * @param mixed $className Class name value to validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateClassNameOnly($className)
     {
@@ -112,4 +112,4 @@ class ClassController
     }
 }
 
-?>
+
