@@ -379,7 +379,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Classwork</a>
+                    <a class="nav-link" href="classwork.php?class_id=<?= htmlspecialchars($class_id) ?>">
+                        Classwork
+                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -543,17 +545,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
                                             <?php
                                             $name = $fileNames[$i] ?? 'file';
-                                            $type = $fileTypes[$i] ?? 'other';
-                                            $url = "/NewSite/" . $path;
+                                            $type = strtolower($fileTypes[$i] ?? 'other');
+                                            $storedPath = $path;
+                                            $viewerUrl = 'viewer.php?file=' . urlencode($storedPath);
                                             ?>
 
                                             <li class="list-group-item">
 
-                                                <?php if ($type === 'jpg' || $type === 'jpeg' || $type === 'png' || $type === 'image'): ?>
-                                                    <img src="<?= htmlspecialchars($url) ?>" style="max-width:200px;">
+                                                <?php if (in_array($type, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'image'], true)): ?>
+                                                    <a href="<?= htmlspecialchars($viewerUrl) ?>" target="_blank">
+                                                        <img src="<?= htmlspecialchars($storedPath) ?>" style="max-width:200px; height:auto; display:block; margin-bottom:8px;">
+                                                    </a>
                                                 <?php endif; ?>
 
-                                                <a href="<?= htmlspecialchars($url) ?>" target="_blank">
+                                                <a href="<?= htmlspecialchars($viewerUrl) ?>" target="_blank">
                                                     📎 <?= htmlspecialchars($name) ?>
                                                 </a>
 
@@ -798,8 +803,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         <div class="file-input-area">
                             <div class="upload-icon">📁</div>
                             <div>Click or drag & drop files</div>
-                            <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
-                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg,.png">
+                            <div class="small text-muted">PDF, DOCX, XLSX, TXT, Images (Max 10MB)</div>
+                            <input type="file" name="files[]" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.webp">
                         </div>
 
                         <div class="file-list mt-3"></div>
@@ -859,8 +864,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         <div class="file-input-area">
                             <div class="upload-icon">📁</div>
                             <div>Click or drag & drop files</div>
-                            <div class="small text-muted">PDF, DOCX, JPG (Max 10MB)</div>
-                            <input type="file" name="files[]" multiple accept=".pdf,.docx,.jpg,.jpeg,.png">
+                            <div class="small text-muted">PDF, DOCX, XLSX, TXT, Images (Max 10MB)</div>
+                            <input type="file" name="files[]" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.webp">
                         </div>
 
                         <div class="file-list mt-3"></div>

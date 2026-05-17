@@ -95,6 +95,13 @@
   cursor: pointer;
   font-weight: 700;
   padding: 0 0.35rem;
+  border: 0;
+  background: transparent;
+  line-height: 1;
+}
+
+.remove-file:hover {
+  color: #991b1b;
 }
 
 .btn-upload {
