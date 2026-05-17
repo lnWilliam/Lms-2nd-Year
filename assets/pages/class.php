@@ -1,4 +1,6 @@
 <?php
+
+
 session_start();
 require_once "../../vendor/autoload.php";
 
@@ -13,6 +15,7 @@ if (!isset($_SESSION["user_data"])) {
 }
 
 $user = $_SESSION['user_data'];
+$user_id = (int) ($user['user_id'] ?? 0); // EDITED: cast session ID to int for strict-types-safe model/controller calls.
 
 // 🔌 DB
 $database = Database::getInstance();
@@ -23,11 +26,11 @@ if (!isset($_GET['class_id'])) {
     die("No class selected.");
 }
 
-$class_id = $_GET['class_id'];
+$class_id = (int) $_GET['class_id']; // EDITED: $_GET values are strings, so cast to int for strict types.
 $upload = new Upload();
 
 // 📚 Get user classes
-$classes = $classModel->getClassesByUser($user['user_id']);
+$classes = $classModel->getClassesByUser($user_id);
 
 // 🔒 Find current class + role
 $currentClass = null;
@@ -71,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
         // Teacher can edit announcement or assignment they made
         if (
             $isTeacher &&
-            $post['postedBy'] == $user['user_id'] &&
+            $post['postedBy'] == $user_id &&
             in_array($post['type'], ['announcement', 'assignment'])
         ) {
             $canEdit = true;
@@ -81,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
         if (
             !$isTeacher &&
             $post['type'] === 'announcement' &&
-            $post['postedBy'] == $user['user_id']
+            $post['postedBy'] == $user_id
         ) {
             $canEdit = true;
         }
@@ -121,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
 
     $post_id = $classModel->createAnnouncement(
         $class_id,
-        $user['user_id'],
+        $user_id,
         $title,
         $description
     );
@@ -160,10 +163,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_announcement']
 // 🗑 Delete post using POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
 
-    $post_id = $_POST['delete_post_id'];
+    $post_id = (int) $_POST['delete_post_id']; // EDITED: $_POST values are strings, so cast to int for strict types.
     $post = $classModel->getPostOwner($post_id);
 
-    if ($post && ($isTeacher || $post['postedBy'] == $user['user_id'])) {
+    if ($post && ($isTeacher || $post['postedBy'] == $user_id)) {
         $classModel->deletePost($post_id);
     }
 
@@ -178,7 +181,7 @@ if (isset($_GET['delete_post'])) {
 
     $post = $classModel->getPostOwner($post_id);
 
-    if ($post && ($isTeacher || $post['postedBy'] == $user['user_id'])) {
+    if ($post && ($isTeacher || $post['postedBy'] == $user_id)) {
         $classModel->deletePost($post_id);
     }
 
@@ -196,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
 
     $post_id = $classModel->createAssignment(
         $class_id,
-        $user['user_id'],
+        $user_id,
         $title,
         $description,
         $due_date,
@@ -397,11 +400,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                     <div class="card p-3 mb-3 teacher-panel">
                         <h5>⚙️ Teacher Panel</h5>
 
-                        <a href="edit_class.php?class_id=<?= htmlspecialchars($class_id) ?>" class="btn btn-light btn-sm mb-2">
+                        <a href="edit_class.php?class_id=<?= htmlspecialchars((string) $class_id) ?>" class="btn btn-light btn-sm mb-2">
                             ✏️ Edit Class
                         </a>
 
-                        <a href="delete_class.php?class_id=<?= htmlspecialchars($class_id) ?>" class="btn btn-light btn-sm">
+                        <a href="delete_class.php?class_id=<?= htmlspecialchars((string) $class_id) ?>" class="btn btn-light btn-sm">
                             🗑 Delete Class
                         </a>
                     </div>
@@ -452,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         // Teacher can edit only announcement/assignment they made
                         if (
                             $isTeacher &&
-                            $post['postedBy'] == $user['user_id'] &&
+                            $post['postedBy'] == $user_id &&
                             in_array($post['type'], ['announcement', 'assignment'])
                         ) {
                             $canEditPost = true;
@@ -462,12 +465,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         if (
                             !$isTeacher &&
                             $post['type'] === 'announcement' &&
-                            $post['postedBy'] == $user['user_id']
+                            $post['postedBy'] == $user_id
                         ) {
                             $canEditPost = true;
                         }
 
-                        $canDeletePost = ($isTeacher || $post['postedBy'] == $user['user_id']);
+                        $canDeletePost = ($isTeacher || $post['postedBy'] == $user_id);
                         ?>
 
                         <div class="card p-3 mb-3 shadow-sm">
@@ -582,7 +585,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                                 <?php endif; ?>
 
                                 <?php if ($canDeletePost): ?>
-                                    <a href="class.php?class_id=<?= htmlspecialchars($class_id) ?>&delete_post=<?= htmlspecialchars($post['post_id']) ?>"
+                                    <a href="class.php?class_id=<?= htmlspecialchars((string) $class_id) ?>&delete_post=<?= htmlspecialchars($post['post_id']) ?>"
                                         class="delete-post-btn"
                                         onclick="return confirm('Delete this post?')">
                                         <i class="fa-solid fa-trash"></i>

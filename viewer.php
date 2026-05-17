@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1); // ADDED: PHP strict types must be the first PHP statement.
+
 $file = isset($_GET['file']) ? basename($_GET['file']) : '';
 $filePath = "documents/" . $file;
 $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
