@@ -2239,7 +2239,7 @@ body .modal-header::before {
 #createClass .modal-header::before { content: "+"; }
 #joinClass .modal-header::before { content: "🔑"; font-size: 1rem; }
 #announcement .modal-header::before { content: "📣"; font-size: 1rem; }
-#assignment .modal-header::before { content: "📝"; font-size: 1rem; }
+#activity .modal-header::before { content: "📝"; font-size: 1rem; }
 .edit-post-modal .modal-header::before { content: "✎"; }
 
 body .modal-title {
@@ -2266,7 +2266,7 @@ body .modal-title::after {
 #createClass .modal-title::after { content: "Set up a new space for lessons, files, and activities."; }
 #joinClass .modal-title::after { content: "Enter the class code shared by your teacher."; }
 #announcement .modal-title::after { content: "Share updates and files with everyone in this class."; }
-#assignment .modal-title::after { content: "Create a task, attach files, and set submission details."; }
+#activity .modal-title::after { content: "Create a task, attach files, and set submission details."; }
 .edit-post-modal .modal-title::after { content: "Update the post content and keep your class feed clear."; }
 
 body .modal .btn-close {

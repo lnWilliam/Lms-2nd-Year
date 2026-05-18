@@ -41,13 +41,13 @@ $isTeacher = ($currentClass['role'] === 'teacher');
 
 $posts = $classModel->getClassPosts($class_id);
 
-$assignments = [];
+$activities = [];
 $announcements = [];
 
 
 foreach ($posts as $post) {
-    if ($post['type'] === 'assignment') {
-        $assignments[] = $post;
+    if ($post['type'] === 'activity') {
+        $activities[] = $post;
     } elseif ($post['type'] === 'announcement') {
         $announcements[] = $post;
     }
@@ -69,8 +69,8 @@ function formatDateTime($date)
 
 function postLink($post)
 {
-    if ($post['type'] === 'assignment') {
-        return 'assignments.php?post_id=' . urlencode((string) $post['post_id']);
+    if ($post['type'] === 'activity') {
+        return 'activity.php?post_id=' . urlencode((string) $post['post_id']);
     }
 
     if ($post['type'] === 'announcement') {
@@ -86,7 +86,7 @@ function renderPostCard($post)
     $badgeClass = 'secondary';
     $icon = 'fa-file';
 
-    if ($type === 'assignment') {
+    if ($type === 'activity') {
         $badgeClass = 'primary';
         $icon = 'fa-file-pen';
     } elseif ($type === 'announcement') {
@@ -131,7 +131,7 @@ function renderPostCard($post)
                         </p>
                     <?php endif; ?>
 
-                    <?php if ($type === 'assignment'): ?>
+                    <?php if ($type === 'activity'): ?>
                         <div class="small mb-2">
                             <span class="text-danger fw-semibold">
                                 Due:
@@ -339,9 +339,9 @@ function renderEmptyState($message)
         <div class="card-body p-3">
             <ul class="nav classwork-tabs gap-2" id="classworkTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments" type="button" role="tab">
-                        Assignments
-                        <span class="ms-1"><?= count($assignments) ?></span>
+                    <button class="nav-link active" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities" type="button" role="tab">
+                        Activities
+                        <span class="ms-1"><?= count($activities) ?></span>
                     </button>
                 </li>
 
@@ -357,18 +357,18 @@ function renderEmptyState($message)
 
     <div class="tab-content">
 
-        <div class="tab-pane fade show active" id="assignments" role="tabpanel">
+        <div class="tab-pane fade show active" id="activities" role="tabpanel">
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <h4 class="classwork-section-title mb-0">Assignments</h4>
-                <span class="classwork-count"><?= count($assignments) ?> item<?= count($assignments) === 1 ? '' : 's' ?></span>
+                <h4 class="classwork-section-title mb-0">Activities</h4>
+                <span class="classwork-count"><?= count($activities) ?> item<?= count($activities) === 1 ? '' : 's' ?></span>
             </div>
 
-            <?php if (!empty($assignments)): ?>
-                <?php foreach ($assignments as $post): ?>
+            <?php if (!empty($activities)): ?>
+                <?php foreach ($activities as $post): ?>
                     <?php renderPostCard($post); ?>
                 <?php endforeach; ?>
             <?php else: ?>
-                <?php renderEmptyState('No assignments posted yet.'); ?>
+                <?php renderEmptyState('No activities posted yet.'); ?>
             <?php endif; ?>
         </div>
 

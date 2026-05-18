@@ -62,10 +62,9 @@ CREATE TABLE Post (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     class_id INT NOT NULL,
     postedBy INT NOT NULL,
-    type ENUM('assignment','announcement') NOT NULL,
+    type ENUM('activity','announcement') NOT NULL,
     title VARCHAR(255),
     description TEXT,
-    due_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (class_id) REFERENCES Classes(class_id)
@@ -78,6 +77,7 @@ CREATE TABLE Post (
 CREATE TABLE Activity (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL UNIQUE,
+    due_date DATETIME NULL,
 	max_score INT DEFAULT 100,
 	allow_late BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (post_id) REFERENCES Post(post_id)

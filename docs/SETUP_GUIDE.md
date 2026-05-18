@@ -53,6 +53,6 @@ http://localhost/Lms/assets/pages/login.php
 2. Create a class.
 3. Register a student account.
 4. Join the class using the class code.
-5. Create an assignment as the teacher.
+5. Create an activity as the teacher.
 6. Submit and unsubmit files as the student.
 7. Grade the submission as the teacher.

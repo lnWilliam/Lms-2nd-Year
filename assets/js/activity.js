@@ -1,34 +1,34 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const assignmentForm = document.getElementById('assignmentForm');
+    const activityForm = document.getElementById('activityForm');
 
-    if (assignmentForm) {
-        assignmentForm.addEventListener('submit', function (event) {
+    if (activityForm) {
+        activityForm.addEventListener('submit', function (event) {
             event.preventDefault();
-            const formData = new FormData(assignmentForm);
-            fetch('assets/handlers/assignment_handler.php', {
+            const formData = new FormData(activityForm);
+            fetch('assets/handlers/activity_handler.php', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Assignment created successfully!');
+                        alert('Activity created successfully!');
                         location.reload();
                     } else {
-                        alert('Error creating assignment: ' + data.message);
+                        alert('Error creating activity: ' + data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while creating the assignment.');
+                    alert('An error occurred while creating the activity.');
                 });
         });
     }
 
-    const assignmentPointsInput = document.getElementById('assignmentPoints');
+    const activityPointsInput = document.getElementById('activityPoints');
 
-    if (assignmentPointsInput) {
-        assignmentPointsInput.addEventListener('input', function () {
+    if (activityPointsInput) {
+        activityPointsInput.addEventListener('input', function () {
             let value = parseInt(this.value);
             if (isNaN(value) || value < 0) {
                 this.value = 0;
@@ -38,15 +38,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const assignmentDueDateInput = document.getElementById('assignmentDueDate');
+    const activityDueDateInput = document.getElementById('activityDueDate');
 
-    if (assignmentDueDateInput) {
+    if (activityDueDateInput) {
         const now = new Date();
         const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-        assignmentDueDateInput.min = localNow;
+        activityDueDateInput.min = localNow;
     }
-    if (assignmentDueDateInput) {
-        assignmentDueDateInput.addEventListener('input', function () {
+    if (activityDueDateInput) {
+        activityDueDateInput.addEventListener('input', function () {
             const selectedDate = new Date(this.value);
             const now = new Date();
             if (selectedDate < now) {

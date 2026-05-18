@@ -56,7 +56,7 @@ if (empty($currentClass['class_desc'])) {
     $currentClass['class_desc'] = "No description";
 }
 
-// ✏️ Edit announcement / assignment
+// ✏️ Edit announcement / activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
 
     $post_id = (int) ($_POST['post_id'] ?? 0);
@@ -71,11 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
 
         $canEdit = false;
 
-        // Teacher can edit announcement or assignment they made
+        // Teacher can edit announcement or activity they made
         if (
             $isTeacher &&
             $post['postedBy'] == $user_id &&
-            in_array($post['type'], ['announcement', 'assignment'])
+            in_array($post['type'], ['announcement', 'activity'])
         ) {
             $canEdit = true;
         }
@@ -189,15 +189,15 @@ if (isset($_GET['delete_post'])) {
     exit();
 }
 
-// 📝 Create assignment
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment'])) {
+// 📝 Create activity
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_activity'])) {
 
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
     $due_date = $_POST['due_date'] ?? null;
     $points = $_POST['points'] ?? null;
 
-    $post_id = $classModel->createAssignment(
+    $post_id = $classModel->createActivity(
         $class_id,
         $user_id,
         $title,
@@ -435,8 +435,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                     </button>
 
                     <?php if ($isTeacher): ?>
-                        <button class="btn btn-primary mb-3" type="button" data-bs-toggle="modal" data-bs-target="#assignment">
-                            ➕ New Assignment
+                        <button class="btn btn-primary mb-3" type="button" data-bs-toggle="modal" data-bs-target="#activity">
+                            ➕ New Activity
                         </button>
                     <?php endif; ?>
 
@@ -447,15 +447,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                     <?php foreach ($posts as $post): ?>
 
                         <?php
-                        $postLink = $post['type'] . "s.php?post_id=" . $post['post_id'];
+                        if ($post['type'] === 'activity') {
+                            $postLink = 'activity.php?post_id=' . $post['post_id'];
+                        } elseif ($post['type'] === 'announcement') {
+                            $postLink = 'announcements.php?post_id=' . $post['post_id'];
+                        } else {
+                            $postLink = 'class.php?class_id=' . $class_id;
+                        }
 
                         $canEditPost = false;
 
-                        // Teacher can edit only announcement/assignment they made
+                        // Teacher can edit only announcement/activity they made
                         if (
                             $isTeacher &&
                             $post['postedBy'] == $user_id &&
-                            in_array($post['type'], ['announcement', 'assignment'])
+                            in_array($post['type'], ['announcement', 'activity'])
                         ) {
                             $canEditPost = true;
                         }
@@ -517,7 +523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                             <?php endif; ?>
 
                             <!-- POINTS -->
-                            <?php if ($post['type'] === 'assignment' && isset($post['max_score'])): ?>
+                            <?php if ($post['type'] === 'activity' && isset($post['max_score'])): ?>
                                 <p class="text-primary">
                                     <strong>Points:</strong>
                                     <?= htmlspecialchars($post['max_score']) ?>
@@ -640,7 +646,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                                                     required><?= htmlspecialchars($post['description']) ?></textarea>
                                             </div>
 
-                                            <?php if ($post['type'] === 'assignment'): ?>
+                                            <?php if ($post['type'] === 'activity'): ?>
 
                                                 <div class="mb-3">
                                                     <label class="form-label">
@@ -821,37 +827,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
         </div>
     </div>
 
-    <!-- Assignment modal -->
-    <div class="modal fade" id="assignment" tabindex="-1" aria-labelledby="assignmentLabel" aria-hidden="true">
+    <!-- Activity modal -->
+    <div class="modal fade" id="activity" tabindex="-1" aria-labelledby="activityLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
 
             <form method="POST" enctype="multipart/form-data" class="modal-content">
 
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="assignmentLabel">New Assignment</h1>
+                    <h1 class="modal-title fs-5" id="activityLabel">New Activity</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        <label class="form-label" for="assignmentTitle">Title</label>
-                        <input type="text" id="assignmentTitle" name="title" class="form-control" required>
+                        <label class="form-label" for="activityTitle">Title</label>
+                        <input type="text" id="activityTitle" name="title" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="assignmentDescription">Description</label>
-                        <textarea id="assignmentDescription" name="description" class="form-control" rows="4" required></textarea>
+                        <label class="form-label" for="activityDescription">Description</label>
+                        <textarea id="activityDescription" name="description" class="form-control" rows="4" required></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="assignmentDueDate">Due Date</label>
-                        <input type="datetime-local" id="assignmentDueDate" name="due_date" class="form-control" required>
+                        <label class="form-label" for="activityDueDate">Due Date</label>
+                        <input type="datetime-local" id="activityDueDate" name="due_date" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="assignmentPoints">Points</label>
-                        <input type="number" id="assignmentPoints" name="points" class="form-control" min="0" max="100" value="0" required>
+                        <label class="form-label" for="activityPoints">Points</label>
+                        <input type="number" id="activityPoints" name="points" class="form-control" min="0" max="100" value="0" required>
                     </div>
 
                     <div class="upload-section">
@@ -872,8 +878,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
                         Close
                     </button>
 
-                    <button type="submit" name="create_assignment" class="btn btn-primary">
-                        Post Assignment
+                    <button type="submit" name="create_activity" class="btn btn-primary">
+                        Post Activity
                     </button>
                 </div>
 
@@ -886,7 +892,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
     <script src="../js/upload.js"></script>
     <script src='../js/animate.js'></script>
     <script src='../js/mobile-menu.js'></script>
-    <script src='../js/assignment.js'></script>
+    <script src='../js/activity.js'></script>
 
     <script>
         const streamBtn = document.getElementById('streamBtn');

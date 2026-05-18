@@ -8,7 +8,7 @@ use App\Utils\Upload;
 use PDO;
 
 /**
- * Handles database operations for classes, posts, assignments, submissions, and attachments. This model keeps LMS data access in one place so pages and controllers do not directly manage SQL.
+ * Handles database operations for classes, posts, activities, submissions, and attachments. This model keeps LMS data access in one place so pages and controllers do not directly manage SQL.
  *
  * @package App\Models
  * @author Charlo Marco
@@ -266,23 +266,22 @@ class ClassModel
     }
 
     /**
-     * Creates the shared post record used by announcements, materials, and assignments.
+     * Creates the shared post record used by announcements and activities.
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $postedBy User identifier of the post author.
-     * @param mixed $type Post type such as announcement, material, or assignment.
+     * @param mixed $type Post type such as announcement or activity.
      * @param mixed $title Post or class title value.
      * @param mixed $description Text description value.
-     * @param mixed $due_date Optional due date for an assignment.
      * @return mixed Operation result used by the caller.
      *
      */
-    public function createPost($class_id, $postedBy, $type, $title, $description, $due_date = null)
+    public function createPost($class_id, $postedBy, $type, $title, $description)
     {
         try {
             $sql = "INSERT INTO Post 
-                    (class_id, postedBy, type, title, description, due_date)
-                    VALUES (?, ?, ?, ?, ?, ?)";
+                    (class_id, postedBy, type, title, description)
+                    VALUES (?, ?, ?, ?, ?)";
 
             $stmt = $this->conn->prepare($sql);
 
@@ -291,8 +290,7 @@ class ClassModel
                 $postedBy,
                 $type,
                 $title,
-                $description,
-                $due_date
+                $description
             ]);
 
             return $this->conn->lastInsertId();
@@ -389,28 +387,27 @@ class ClassModel
     }
 
     /**
-     * Creates an assignment post and its activity settings for grading.
+     * Creates an activity post and its activity settings for grading.
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $postedBy User identifier of the post author.
      * @param mixed $title Post or class title value.
      * @param mixed $description Text description value.
-     * @param mixed $due_date Optional due date for an assignment.
-     * @param mixed $max_score Maximum score allowed for the assignment.
+     * @param mixed $due_date Optional due date for an activity.
+     * @param mixed $max_score Maximum score allowed for the activity.
      * @param mixed $allow_late Whether late submissions are allowed.
      * @return mixed Operation result used by the caller.
      *
      */
-    public function createAssignment($class_id, $postedBy, $title, $description, $due_date, $max_score = 100, $allow_late = false)
+    public function createActivity($class_id, $postedBy, $title, $description, $due_date, $max_score = 100, $allow_late = false)
     {
         try {
             $post_id = $this->createPost(
                 $class_id,
                 $postedBy,
-                'assignment',
+                'activity',
                 $title,
-                $description,
-                $due_date
+                $description
             );
 
             if (!$post_id) {
@@ -418,20 +415,21 @@ class ClassModel
             }
 
             $sql = "INSERT INTO Activity
-                (post_id, max_score, allow_late)
-                VALUES (?, ?, ?)";
+                (post_id, due_date, max_score, allow_late)
+                VALUES (?, ?, ?, ?)";
 
             $stmt = $this->conn->prepare($sql);
 
             $stmt->execute([
                 $post_id,
+                $due_date,
                 $max_score,
                 $allow_late
             ]);
 
             return $post_id;
         } catch (\PDOException $e) {
-            error_log("Create assignment error: " . $e->getMessage());
+            error_log("Create activity error: " . $e->getMessage());
             return false;
         }
     }
@@ -526,7 +524,7 @@ class ClassModel
             p.type,
             p.title,
             p.description,
-            p.due_date,
+            act.due_date,
             p.created_at,
             p.postedBy,
             u.first_name,
@@ -649,13 +647,13 @@ class ClassModel
     }
 
     /**
-     * Updates post content and assignment settings while preserving post type rules.
+     * Updates post content and activity settings while preserving post type rules.
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @param mixed $title Post or class title value.
      * @param mixed $description Text description value.
-     * @param mixed $due_date Optional due date for an assignment.
-     * @param mixed $max_score Maximum score allowed for the assignment.
+     * @param mixed $due_date Optional due date for an activity.
+     * @param mixed $max_score Maximum score allowed for the activity.
      * @return mixed Operation result used by the caller.
      *
      */
@@ -671,12 +669,11 @@ class ClassModel
                 return false;
             }
 
-            if ($post['type'] === 'assignment') {
+            if ($post['type'] === 'activity') {
 
                 $sql = "UPDATE Post
                     SET title = ?,
-                        description = ?,
-                        due_date = ?
+                        description = ?
                     WHERE post_id = ?";
 
                 $stmt = $this->conn->prepare($sql);
@@ -684,17 +681,18 @@ class ClassModel
                 $stmt->execute([
                     $title,
                     $description,
-                    $due_date,
                     $post_id
                 ]);
 
                 $sql = "UPDATE Activity
-                    SET max_score = ?
+                    SET due_date = ?,
+                        max_score = ?
                     WHERE post_id = ?";
 
                 $stmt = $this->conn->prepare($sql);
 
                 $stmt->execute([
+                    $due_date,
                     $max_score,
                     $post_id
                 ]);
@@ -723,13 +721,13 @@ class ClassModel
         }
     }
     /**
-     * Retrieves assignment details by post ID so the assignment page can load the activity.
+     * Retrieves activity details by post ID so the activity page can load the activity.
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @return mixed Operation result used by the caller.
      *
      */
-    public function getAssignmentByPostId($post_id)
+    public function getActivityByPostId($post_id)
     {
         try {
             $sql = "SELECT
@@ -738,7 +736,7 @@ class ClassModel
                     p.postedBy,
                     p.title,
                     p.description,
-                    p.due_date,
+                    act.due_date,
                     p.created_at,
                     act.activity_id,
                     act.max_score,
@@ -746,14 +744,14 @@ class ClassModel
                 FROM Post p
                 JOIN Activity act ON act.post_id = p.post_id
                 WHERE p.post_id = ?
-                AND p.type = 'assignment'
+                AND p.type = 'activity'
                 LIMIT 1";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$post_id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            error_log('Get assignment error: ' . $e->getMessage());
+            error_log('Get activity error: ' . $e->getMessage());
             return false;
         }
     }
@@ -786,11 +784,11 @@ class ClassModel
      * Retrieves students, submissions, file counts, and grades for teacher grading view.
      *
      * @param mixed $class_id Class identifier involved in the operation.
-     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $activity_id Activity activity identifier.
      * @return mixed Operation result used by the caller.
      *
      */
-    public function getAssignmentGrades($class_id, $activity_id)
+    public function getActivityGrades($class_id, $activity_id)
     {
         try {
             $sql = "SELECT
@@ -824,17 +822,17 @@ class ClassModel
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            error_log('Get assignment grades error: ' . $e->getMessage());
+            error_log('Get activity grades error: ' . $e->getMessage());
             return [];
         }
     }
 
     /**
-     * Creates or updates a submission grade for a student in an assignment.
+     * Creates or updates a submission grade for a student in an activity.
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $student_id Student user identifier involved in the operation.
-     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $activity_id Activity activity identifier.
      * @param mixed $grade Grade value to save.
      * @return mixed Operation result used by the caller.
      *
@@ -875,11 +873,11 @@ class ClassModel
     }
 
     /**
-     * Retrieves a student submission row for assignment status and grade display.
+     * Retrieves a student submission row for activity status and grade display.
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $student_id Student user identifier involved in the operation.
-     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $activity_id Activity activity identifier.
      * @return mixed Operation result used by the caller.
      *
      */
@@ -919,12 +917,12 @@ class ClassModel
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $student_id Student user identifier involved in the operation.
-     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $activity_id Activity activity identifier.
      * @param array $files Uploaded files array from the request.
      * @return mixed Operation result used by the caller.
      *
      */
-    public function submitAssignmentFiles(int|string $class_id, int|string $student_id, int|string $activity_id, array $files): array
+    public function submitActivityFiles(int|string $class_id, int|string $student_id, int|string $activity_id, array $files): array
     {
         try {
             $uploader = new Upload();
@@ -1037,14 +1035,14 @@ class ClassModel
 
             return [
                 'success' => true,
-                'message' => 'Assignment turned in successfully.'
+                'message' => 'Activity turned in successfully.'
             ];
         } catch (\PDOException $e) {
             if ($this->conn->inTransaction()) {
                 $this->conn->rollBack();
             }
 
-            error_log('Submit assignment error: ' . $e->getMessage());
+            error_log('Submit activity error: ' . $e->getMessage());
 
             return [
                 'success' => false,
@@ -1086,7 +1084,7 @@ class ClassModel
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $student_id Student user identifier involved in the operation.
-     * @param mixed $activity_id Assignment activity identifier.
+     * @param mixed $activity_id Activity activity identifier.
      * @return mixed Operation result used by the caller.
      *
      */
@@ -1251,7 +1249,7 @@ class ClassModel
         }
     }
 
-    public function unsubmitAssignment(int|string $class_id, int|string $student_id, int|string $activity_id): array
+    public function unsubmitActivity(int|string $class_id, int|string $student_id, int|string $activity_id): array
     {
         try {
             $this->conn->beginTransaction();
@@ -1323,18 +1321,18 @@ class ClassModel
 
             return [
                 'success' => true,
-                'message' => 'Assignment unsubmitted successfully.'
+                'message' => 'Activity unsubmitted successfully.'
             ];
         } catch (\PDOException $e) {
             if ($this->conn->inTransaction()) {
                 $this->conn->rollBack();
             }
 
-            error_log('Unsubmit assignment error: ' . $e->getMessage());
+            error_log('Unsubmit activity error: ' . $e->getMessage());
 
             return [
                 'success' => false,
-                'message' => 'Unable to unsubmit assignment.'
+                'message' => 'Unable to unsubmit activity.'
             ];
         }
     }

@@ -46,7 +46,7 @@ Important columns:
 - `role`
 
 ### `Post`
-Stores announcements, assignments, and materials.
+Stores announcements, activities, and materials.
 
 Important columns:
 
@@ -59,7 +59,7 @@ Important columns:
 - `due_date`
 
 ### `Activity`
-Stores assignment-specific data.
+Stores activity-specific data.
 
 Important columns:
 
@@ -69,7 +69,7 @@ Important columns:
 - `allow_late`
 
 ### `Submission`
-Stores student assignment submission records.
+Stores student activity submission records.
 
 Important columns:
 
@@ -81,7 +81,7 @@ Important columns:
 - `status`
 
 ### `Submission_Attachment`
-Stores files uploaded by students for assignment submissions.
+Stores files uploaded by students for activity submissions.
 
 Important columns:
 

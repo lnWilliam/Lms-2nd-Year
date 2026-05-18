@@ -10,15 +10,15 @@ Teachers can create classes. Students can join using a class code. Teachers can 
 
 ## Class stream
 
-The class stream displays posts such as announcements and assignments. Posts may include attachments.
+The class stream displays posts such as announcements and activities. Posts may include attachments.
 
-## Assignments
+## Activities
 
-Teachers can create assignments with descriptions, due dates, points, and optional files.
+Teachers can create activities with descriptions, due dates, points, and optional files.
 
 ## Submissions
 
-Students can submit assignment files. Supported file types are handled by `Upload.php`.
+Students can submit activity files. Supported file types are handled by `Upload.php`.
 
 ## Unsubmit
 
