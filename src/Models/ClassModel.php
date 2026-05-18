@@ -584,16 +584,6 @@ class ClassModel
                 $uploader->deleteFile($file['file_path']);
             }
 
-            // 3. Delete DB attachments
-            $this->conn->prepare("DELETE FROM Attachment WHERE post_id = ?")->execute([$post_id]);
-
-            // 4. Delete related tables
-            $this->conn->prepare("DELETE FROM Material WHERE post_id = ?")->execute([$post_id]);
-
-            $this->conn->prepare("DELETE FROM Announcement WHERE post_id = ?")->execute([$post_id]);
-
-            $this->conn->prepare("DELETE FROM Activity WHERE post_id = ?")->execute([$post_id]);
-
             // 5. Delete post
             $this->conn->prepare("DELETE FROM Post WHERE post_id = ?")->execute([$post_id]);
 

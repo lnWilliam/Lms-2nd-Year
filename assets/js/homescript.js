@@ -31,7 +31,7 @@ if (class_name) {
                 classStatus.textContent = 'Checking validity...';
                 classStatus.className = 'class-status checking';
                 
-                if (!/^[a-zA-Z][a-zA-Z0-9_.]*$/.test(name)) {
+                if (!/^[a-zA-Z][a-zA-Z0-9 _.]*$/.test(name)) {
                     classStatus.textContent = 'Class Name can only contain letters, numbers, underscores and dots';
                     class_name.setCustomValidity("Class Name can only contain letters, numbers, underscores and dots and 1 @");
                     classStatus.className = 'class-status unavailable';

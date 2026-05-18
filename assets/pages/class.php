@@ -334,10 +334,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_assignment']))
             Home
         </a>
 
-        <a href="#">
-            <span class="nav-ico" aria-hidden="true">▤</span>
-            Calendar
-        </a>
+
+
 
         <a href="#">
             <span class="nav-ico" aria-hidden="true">◎</span>

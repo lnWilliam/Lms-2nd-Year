@@ -179,7 +179,7 @@ if (isset($_SESSION['success'])) {
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Create Class</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -190,7 +190,7 @@ if (isset($_SESSION['success'])) {
             <div id="classStatus" class="classStatus"></div>
         </div>
         <div class="input-box">
-          <label for='class_desc'>Class Decription:</label>
+          <label for='class_desc'>Class Description:</label>
           <input type="text" id='class_desc' name="class_desc">
         </div>
 
@@ -209,7 +209,7 @@ if (isset($_SESSION['success'])) {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="joinlLabel">Modal title</h1>
+            <h1 class="modal-title fs-5" id="joinlLabel">Join</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -228,7 +228,7 @@ if (isset($_SESSION['success'])) {
     <aside class="sidebar lms-sidebar" aria-label="Primary navigation">
       <p class="sidebar-label">Learn</p>
       <a class="is-active" href="home.php"><span class="nav-ico" aria-hidden="true">⌂</span> Home</a>
-      <a href="class.php"><span class="nav-ico" aria-hidden="true">▤</span> My courses</a>
+      <a href="#"><span class="nav-ico" aria-hidden="true">▤</span> My courses</a>
       <?php if (isset($_SESSION['classes'])) {
         foreach ($classes as $class) {
           echo '<a href="class.php?class_id=' . $class['class_id'] . '">' . $class['class_name'] . '</a>';
