@@ -380,3 +380,34 @@
     align-items: stretch;
   }
 }
+
+/* Lively upload/document cards */
+.upload-section {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,250,252,0.76)),
+    radial-gradient(circle at 90% 12%, rgba(14, 165, 233, 0.14), transparent 9rem) !important;
+}
+
+.file-input-area::before {
+  content: "";
+  position: absolute;
+  inset: 0.85rem;
+  border-radius: inherit;
+  background-image: radial-gradient(circle, rgba(14,165,233,0.16) 1.5px, transparent 2px);
+  background-size: 18px 18px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.file-input-area > * {
+  position: relative;
+  z-index: 1;
+}
+
+.upload-icon {
+  filter: drop-shadow(0 10px 18px rgba(14, 165, 233, 0.20));
+}
+
+.document-card {
+  border-radius: calc(var(--lms-radius) + 4px);
+}
