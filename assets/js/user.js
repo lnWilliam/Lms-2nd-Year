@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (usernameInput && usernameStatus) {
         usernameInput.addEventListener('input', function () {
-            const username = this.value.trim();
+            const username = this.value;
             usernameInput.setCustomValidity('');
             clearTimeout(usernameTimeout);
 

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Helpers\Database;
@@ -21,7 +23,7 @@ class UserModel
      *
      * @param mixed $database Database helper used to obtain the PDO connection.
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct(Database $database)
     {
@@ -32,7 +34,7 @@ class UserModel
      * Retrieves all account records for administrative listing or debugging use.
      *
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function selectAll(): array
     {
@@ -60,7 +62,7 @@ class UserModel
      *
      * @param mixed $id Account identifier.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     * 
      */
     public function getUser(int|string $id): array|false
     {
@@ -81,22 +83,24 @@ class UserModel
      *
      * @param mixed $username Username value to check or validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     * 
      */
     public function getUserByUsername(string $username): array|false
     {
         try {
-            $sql = "SELECT
-                        a.account_id,
-                        a.username,
-                        a.email,
-                        a.password,
-                        u.user_id,
-                        u.first_name,
-                        u.last_name
-                    FROM Account a
-                    JOIN Users u ON a.account_id = u.account_id
-                    WHERE a.username = ?";
+            $sql = "SELECT 
+                    a.account_id, 
+                    a.username, 
+                    a.email,
+                    a.password, 
+                    u.user_id, 
+                    u.first_name, 
+                    u.last_name,
+                    u.status
+                FROM Account a
+                JOIN Users u ON a.account_id = u.account_id
+                WHERE a.username = ?
+                LIMIT 1";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$username]);
@@ -113,7 +117,7 @@ class UserModel
      *
      * @param array $data Associative array of values required by the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     * 
      */
     public function updateUser(array $data): bool
     {
@@ -140,9 +144,9 @@ class UserModel
      *
      * @param array $data Associative array of values required by the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
-    public function insert(array $data): bool
+    public function insertUser(array $data): bool
     {
         try {
             $this->conn->beginTransaction();
@@ -186,31 +190,11 @@ class UserModel
     }
 
     /**
-     * Deletes an account record so related profile data can cascade according to the database schema.
-     *
-     * @param mixed $id Account identifier.
-     * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
-     */
-    public function deleteUser(int|string $id): bool
-    {
-        try {
-            $sql = "DELETE FROM Account WHERE account_id = ?";
-            $stmt = $this->conn->prepare($sql);
-
-            return $stmt->execute([$id]);
-        } catch (\PDOException $e) {
-            error_log("Delete user error: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Checks whether a username is unused before registration accepts it.
      *
      * @param mixed $username Username value to check or validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function checkUsernameAvailability(string $username): bool
     {
@@ -231,7 +215,7 @@ class UserModel
      *
      * @param mixed $email Email address value to check or validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function checkEmailAvailability(string $email): bool
     {
@@ -243,6 +227,131 @@ class UserModel
             return $stmt->rowCount() === 0;
         } catch (\PDOException $e) {
             error_log("Check email availability error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Updates the account email and user profile name.
+     *
+     * @param int|string $user_id The user ID from the Users table.
+     * @param array $data Updated profile data.
+     * @return bool True if the profile was updated, false otherwise.
+     */
+    public function updateProfile(int|string $user_id, array $data): bool
+    {
+        try {
+            $this->conn->beginTransaction();
+
+            $sql = "UPDATE Users
+                SET first_name = ?,
+                    last_name = ?
+                WHERE user_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                $data['first_name'],
+                $data['last_name'],
+                $user_id
+            ]);
+
+            $sql = "UPDATE Account a
+                JOIN Users u ON u.account_id = a.account_id
+                SET a.email = ?
+                WHERE u.user_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                $data['email'],
+                $user_id
+            ]);
+
+            $this->conn->commit();
+
+            return true;
+        } catch (\PDOException $e) {
+            if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+            }
+
+            error_log("Update profile error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Updates the account password of a user.
+     *
+     * @param int|string $user_id The user ID from the Users table.
+     * @param string $passwordHash The hashed password to save.
+     * @return bool True if the password was updated, false otherwise.
+     */
+    public function updatePassword(int|string $user_id, string $passwordHash): bool
+    {
+        try {
+            $sql = "UPDATE Account a
+                JOIN Users u ON u.account_id = a.account_id
+                SET a.password = ?
+                WHERE u.user_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+
+            return $stmt->execute([
+                $passwordHash,
+                $user_id
+            ]);
+        } catch (\PDOException $e) {
+            error_log("Update password error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Gets the latest user data for the current session.
+     *
+     * @param int|string $user_id The user ID from the Users table.
+     * @return array|false User data if found, otherwise false.
+     */
+    public function getUserById(int|string $user_id): array|false
+    {
+        try {
+            $sql = "SELECT
+                    a.account_id,
+                    a.username,
+                    a.email,
+                    a.password,
+                    u.user_id,
+                    u.first_name,
+                    u.last_name
+                FROM Account a
+                JOIN Users u ON u.account_id = a.account_id
+                WHERE u.user_id = ?
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$user_id]);
+
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get user by ID error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deactivateUser(int|string $user_id): bool
+    {
+        try {
+            $sql = "UPDATE Users
+                SET status = 'Inactive'
+                WHERE user_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+
+            return $stmt->execute([
+                $user_id
+            ]);
+        } catch (\PDOException $e) {
+            error_log("Deactivate user error: " . $e->getMessage());
             return false;
         }
     }

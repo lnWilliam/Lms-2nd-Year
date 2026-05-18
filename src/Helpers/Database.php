@@ -24,7 +24,7 @@ class Database {
      * Initializes the object with the dependencies it needs to perform its responsibility.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct()
     {
@@ -37,7 +37,7 @@ class Database {
      * Blocks cloning so the singleton connection manager cannot be duplicated unexpectedly.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     private function __clone() {}
     
@@ -46,7 +46,7 @@ class Database {
      * Blocks unserialization so the singleton connection manager cannot be duplicated unexpectedly.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __wakeup() {
         throw new RuntimeException("Cannot unserialize singleton");
@@ -58,7 +58,7 @@ class Database {
      * Loads database settings from environment variables so credentials are not hard-coded.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     private function loadConfig()
     {
@@ -81,7 +81,7 @@ class Database {
      * Creates the PDO connection used by the application models.
      *
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     private function connect()
     {
@@ -116,7 +116,7 @@ class Database {
      * Returns the shared Database instance so the application uses one connection manager.
      *
      * @return Database Database singleton instance.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public static function getInstance(): Database {
         if (self::$instance === null) {
@@ -130,7 +130,7 @@ class Database {
      * Returns the active PDO connection for model queries.
      *
      * @return \PDO PDO connection object.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getConnection(){
         return $this->conn;
@@ -140,7 +140,7 @@ class Database {
      * Returns the last inserted database identifier for follow-up insert operations.
      *
      * @return string Last insert ID as a string.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function lastInsertId(): string {
         return $this->conn->lastInsertId();
@@ -150,7 +150,7 @@ class Database {
      * Starts a database transaction so related queries can succeed or fail together.
      *
      * @return bool True when the transaction starts successfully.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function beginTransaction(): bool {
         return $this->conn->beginTransaction();
@@ -160,7 +160,7 @@ class Database {
      * Commits the active database transaction after all related queries succeed.
      *
      * @return bool True when the transaction is committed successfully.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function commit(): bool {
         return $this->conn->commit();
@@ -170,7 +170,7 @@ class Database {
      * Rolls back the active transaction to avoid partial database changes after a failure.
      *
      * @return bool True when the transaction is rolled back successfully.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function rollBack(): bool {
         return $this->conn->rollBack();

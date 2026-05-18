@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 error_reporting(E_ALL);
@@ -68,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $_SESSION['success'] = $result['message'];
     } else {
       $_SESSION['error'] = $result['message'];
-      
     }
   }
 
@@ -77,16 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 }
 
 if (isset($_SESSION['success'])) {
-    $message = $_SESSION['success'];
-    $messageType = 'success';
-    
-    unset($_SESSION['success']);
-    
+  $message = $_SESSION['success'];
+  $messageType = 'success';
+
+  unset($_SESSION['success']);
 } elseif (isset($_SESSION['error'])) {
-    $message = $_SESSION['error'];
-    $messageType = 'error';
-    
-    unset($_SESSION['error']);
+  $message = $_SESSION['error'];
+  $messageType = 'error';
+
+  unset($_SESSION['error']);
 }
 
 
@@ -142,7 +141,9 @@ if (isset($_SESSION['success'])) {
             <ul class="dropdown-menu dropdown-menu-end w-100">
               <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
               <li><a class="dropdown-item" href="#">Preferences</a></li>
-              <li><hr class="dropdown-divider"></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
               <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
             </ul>
           </div>
@@ -166,7 +167,9 @@ if (isset($_SESSION['success'])) {
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="account_settings.php">Profile</a></li>
             <li><a class="dropdown-item" href="#">Preferences</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
             <li><a class="dropdown-item" href="logout.php">Sign out</a></li>
           </ul>
         </div>
@@ -174,143 +177,150 @@ if (isset($_SESSION['success'])) {
     </div>
   </nav>
 
-<!-- Create Class Modal -->
-<div class="modal fade" id="createClass" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Create Class</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" id="createClassForm">
-          <div class="input-box">
-            <label for=' class_name'>Class Name:</label>
-            <input type="text" id='class_name' name="class_name" required>
-            <div id="classStatus" class="classStatus"></div>
+  <!-- Create Class Modal -->
+  <div class="modal fade" id="createClass" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Create Class</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="input-box">
-          <label for='class_desc'>Class Description:</label>
-          <input type="text" id='class_desc' name="class_desc">
-        </div>
+        <div class="modal-body">
+          <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" id="createClassForm">
+            <div class="input-box">
+              <label for=' class_name'>Class Name:</label>
+              <input type="text" id='class_name' name="class_name" required>
+              <div id="classStatus" class="classStatus"></div>
+            </div>
+            <div class="input-box">
+              <label for='class_desc'>Class Description:</label>
+              <input type="text" id='class_desc' name="class_desc">
+            </div>
 
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" name='createClass' class="btn btn-primary">Create Class</button>
-      </div>
-      </form>
-    </div>
-    </div>
-    </div>
-    <!-- Join Class Modal -->
-    <div class="modal fade" id="joinClass" tabindex="-1" aria-labelledby="joinLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="joinlLabel">Join</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form method="POST">
-              <input type="text" name="class_code" placeholder="Enter class code" required>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" name="joinClass" class="btn btn-primary">Join Class</button>
-          </div>
-          </form>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name='createClass' class="btn btn-primary">Create Class</button>
+        </div>
+        </form>
       </div>
     </div>
-    <!-- SIDEBAR -->
-    <aside class="sidebar lms-sidebar" aria-label="Primary navigation">
-      <p class="sidebar-label">Learn</p>
-      <a class="is-active" href="home.php"><span class="nav-ico" aria-hidden="true">⌂</span> Home</a>
-      <a href="#"><span class="nav-ico" aria-hidden="true">▤</span> My courses</a>
-      <?php if (isset($_SESSION['classes'])) {
-        foreach ($classes as $class) {
-          echo '<a href="class.php?class_id=' . $class['class_id'] . '">' . $class['class_name'] . '</a>';
-        }
+  </div>
+  <!-- Join Class Modal -->
+  <div class="modal fade" id="joinClass" tabindex="-1" aria-labelledby="joinLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="joinLabel">Join Class</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST">
+            <input type="text" name="class_code" placeholder="Enter class code" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="joinClass" class="btn btn-primary">Join Class</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar lms-sidebar" aria-label="Primary navigation">
+    <p class="sidebar-label">Learn</p>
+    <a class="is-active" href="home.php"><span class="nav-ico" aria-hidden="true">⌂</span> Home</a>
+    <a href="my_courses.php">
+      <span class="nav-ico" aria-hidden="true">▤</span>
+      My Courses
+    </a>
+    <?php if (isset($_SESSION['classes'])) {
+      foreach ($classes as $class) {
+        echo '<a href="class.php?class_id=' . $class['class_id'] . '">' . $class['class_name'] . '</a>';
       }
-      ?>
-    </aside>
+    }
+    ?>
+    <a href="archive_classes.php">
+      <span class="nav-ico" aria-hidden="true">🗄</span>
+      Archived Classes
+    </a>
+  </aside>
 
-    <!-- MAIN -->
-    <main class="main lms-main">
-      <div class="hero lms-hero">
-        <h2>Welcome Back <?php echo isset($user) ? $user['first_name'] . " " . $user['last_name'] : "" ?>👋</h2>
-        <p>Continue where you left off—your next lesson is a click away.</p>
-        <div class="hero-meta">
-        </div>
+  <!-- MAIN -->
+  <main class="main lms-main">
+    <div class="hero lms-hero">
+      <h2>Welcome Back <?php echo isset($user) ? $user['first_name'] . " " . $user['last_name'] : "" ?>👋</h2>
+      <p>Continue where you left off—your next lesson is a click away.</p>
+      <div class="hero-meta">
       </div>
+    </div>
 
-      <!-- Classes -->
-      <h4 class="mb-3">📚 My Classes</h4>
-      
-      <div class="row g-4">
-        <?php
-          if (isset($_SESSION['classes'])) {
-            
-            foreach ($classes as $classes) {
-              $id = '"'. $classes['class_id'].'"';
-              if($classes['class_desc'] ===""){
-                $classes['class_desc'] = 'No description';
-              }
-              echo'<div class="col-md-4 text-center">
+    <!-- Classes -->
+    <h4 class="mb-3">📚 My Classes</h4>
+
+    <div class="row g-4">
+      <?php
+      if (isset($_SESSION['classes'])) {
+
+        foreach ($classes as $classes) {
+          $id = '"' . $classes['class_id'] . '"';
+          if ($classes['class_desc'] === "") {
+            $classes['class_desc'] = 'No description';
+          }
+          echo '<div class="col-md-4 text-center">
                     <div class="card p-3 shadow-sm">
-                      <h5>'.$classes['class_name'].'</h5>
-                      <p>'.$classes['class_desc'].'</p>
+                      <h5>' . $classes['class_name'] . '</h5>
+                      <p>' . $classes['class_desc'] . '</p>
                       <div class="progress mb-2">
                         <div class="progress-bar" style="width: 70%"></div>
                       </div>
-                      <a href="class.php?class_id='.$classes['class_id'].'"class="btn btn-primary btn-sm">Continue</a>
+                      <a href="class.php?class_id=' . $classes['class_id'] . '"class="btn btn-primary btn-sm">Continue</a>
                     </div>
                   </div>';
-            }
-          }
-        ?>
-      </div>
-      </div>
-     <?php if (isset($message)): ?>
-        <div class="position-fixed start-50 translate-middle-x" style="top: 30%; z-index: 11;">
-            <div id="myToast" class="toast message <?php echo $messageType; ?> border-0">
-            <div class="toast-body text-center fw-bold">
-                <?php echo $message; ?>
-            </div>
-            </div>
+        }
+      }
+      ?>
+    </div>
+    </div>
+    <?php if (isset($message)): ?>
+      <div class="position-fixed start-50 translate-middle-x" style="top: 30%; z-index: 11;">
+        <div id="myToast" class="toast message <?php echo $messageType; ?> border-0">
+          <div class="toast-body text-center fw-bold">
+            <?php echo $message; ?>
+          </div>
         </div>
+      </div>
 
-        <script>
-            const toast = new bootstrap.Toast(document.getElementById('myToast'), {
-                delay: 2000
-            });
-            toast.show();
-        </script>
-
-    <?php unset($message); ?>
-    <?php endif; ?>
       <script>
-        function isInViewport(el) {
-          const rect = el.getBoundingClientRect();
-          return (
-            rect.top <= window.innerHeight * 0.85 &&
-            rect.bottom >= 0
-          );
-        }
-
-        function handleScroll() {
-          document.querySelectorAll(".card, .stat-box").forEach(el => {
-            if (isInViewport(el)) {
-              el.classList.add("animate-up");
-            }
-          });
-        }
-
-        window.addEventListener("scroll", handleScroll);
-        window.addEventListener("load", handleScroll);
+        const toast = new bootstrap.Toast(document.getElementById('myToast'), {
+          delay: 2000
+        });
+        toast.show();
       </script>
+
+      <?php unset($message); ?>
+    <?php endif; ?>
+    <script>
+      function isInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+          rect.top <= window.innerHeight * 0.85 &&
+          rect.bottom >= 0
+        );
+      }
+
+      function handleScroll() {
+        document.querySelectorAll(".card, .stat-box").forEach(el => {
+          if (isInViewport(el)) {
+            el.classList.add("animate-up");
+          }
+        });
+      }
+
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("load", handleScroll);
+    </script>
 </body>
 
 </html>

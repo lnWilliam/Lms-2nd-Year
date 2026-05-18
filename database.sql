@@ -3,8 +3,20 @@ CREATE DATABASE IF NOT EXISTS EduRIft_db;
 
 USE EduRIft_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS Submission_Attachment;
+DROP TABLE IF EXISTS Submission;
+DROP TABLE IF EXISTS Attachment;
 DROP TABLE IF EXISTS Announcement;
 DROP TABLE IF EXISTS Activity;
+DROP TABLE IF EXISTS Post;
+DROP TABLE IF EXISTS Class_User;
+DROP TABLE IF EXISTS Classes;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Account;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE IF NOT EXISTS Account(
 	account_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,6 +90,7 @@ CREATE TABLE IF NOT EXISTS Submission(
     activity_id INT NOT NULL,
     grade DECIMAL(5,2) ,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status varchar(50) DEFAULT 'Submitted',
     PRIMARY KEY(submission_id),
     FOREIGN KEY (class_user_id) REFERENCES Class_User(class_user_id)
 	ON DELETE CASCADE
@@ -130,5 +143,21 @@ CREATE INDEX idx_submission_activity ON Submission(activity_id);
 CREATE INDEX idx_class_user_user ON Class_User(user_id);
 CREATE INDEX idx_post_class_user_combo ON Post(class_id, postedBy);
 CREATE INDEX idx_post_class_type ON Post(class_id, type);
+
+START TRANSACTION;
+
+INSERT INTO Account (username, email, password)
+VALUES ('admin', 'admin@example.com', '$2y$10$67f.zyWdFzXKSwqNlAbZXutRMTOo/tG.WvAVgHzPI7KOJ64sDL8rq');
+
+INSERT INTO Users (account_id, first_name, last_name)
+VALUES (LAST_INSERT_ID(), 'Admin', 'User');
+
+INSERT INTO Account (username, email, password)
+VALUES ('student1', 'student@gmail.com', '$2y$10$67f.zyWdFzXKSwqNlAbZXutRMTOo/tG.WvAVgHzPI7KOJ64sDL8rq');
+
+INSERT INTO Users (account_id, first_name, last_name)
+VALUES (LAST_INSERT_ID(), 'Student', 'One');
+
+COMMIT;
 
 

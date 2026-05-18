@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Utils\Upload;
@@ -21,7 +23,7 @@ class ClassModel
      *
      * @param mixed $database Database helper used to obtain the PDO connection.
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct($database)
     {
@@ -34,7 +36,7 @@ class ClassModel
      * @param mixed $user_id User identifier involved in the operation.
      * @param array $data Associative array of values required by the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function createClass($user_id, $data)
     {
@@ -76,7 +78,7 @@ class ClassModel
      *
      * @param mixed $classCode Class code value to check for uniqueness.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function checkClassCodeAvailability($classCode)
     {
@@ -91,7 +93,7 @@ class ClassModel
      *
      * @param mixed $user_id User identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getClassesByUser($user_id)
     {
@@ -123,7 +125,7 @@ class ClassModel
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getStudents($class_id)
     {
@@ -159,7 +161,7 @@ class ClassModel
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $student_id Student user identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function removeStudentFromClass($class_id, $student_id)
     {
@@ -186,7 +188,7 @@ class ClassModel
      * @param mixed $user_id User identifier involved in the operation.
      * @param mixed $class_code Class code entered by the user.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function joinClassByCode($user_id, $class_code)
     {
@@ -248,7 +250,7 @@ class ClassModel
      * @param mixed $user_id User identifier involved in the operation.
      * @param mixed $class_id Class identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function leaveClass($user_id, $class_id)
     {
@@ -273,7 +275,7 @@ class ClassModel
      * @param mixed $description Text description value.
      * @param mixed $due_date Optional due date for an assignment.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function createPost($class_id, $postedBy, $type, $title, $description, $due_date = null)
     {
@@ -309,7 +311,7 @@ class ClassModel
      * @param mixed $description Text description value.
      * @param array $files Uploaded files array from the request.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function createAnnouncement($class_id, $postedBy, $title, $description, $files = [])
     {
@@ -397,7 +399,7 @@ class ClassModel
      * @param mixed $max_score Maximum score allowed for the assignment.
      * @param mixed $allow_late Whether late submissions are allowed.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function createAssignment($class_id, $postedBy, $title, $description, $due_date, $max_score = 100, $allow_late = false)
     {
@@ -441,7 +443,7 @@ class ClassModel
      * @param mixed $title Post or class title value.
      * @param mixed $description Text description value.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function createMaterial($class_id, $postedBy, $title, $description)
     {
@@ -482,7 +484,7 @@ class ClassModel
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getTeacher($class_id)
     {
@@ -512,7 +514,7 @@ class ClassModel
      *
      * @param mixed $class_id Class identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getClassPosts($class_id)
     {
@@ -565,7 +567,7 @@ class ClassModel
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function deletePost($post_id)
     {
@@ -584,7 +586,6 @@ class ClassModel
                 $uploader->deleteFile($file['file_path']);
             }
 
-            // 5. Delete post
             $this->conn->prepare("DELETE FROM Post WHERE post_id = ?")->execute([$post_id]);
 
             $this->conn->commit();
@@ -604,7 +605,7 @@ class ClassModel
      * @param mixed $file_path Stored file path for the attachment.
      * @param mixed $file_name Original file name for display.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function addAttachment($post_id, $attachment_type, $file_path, $file_name)
     {
@@ -627,7 +628,7 @@ class ClassModel
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getPostOwner($post_id)
     {
@@ -656,7 +657,7 @@ class ClassModel
      * @param mixed $due_date Optional due date for an assignment.
      * @param mixed $max_score Maximum score allowed for the assignment.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function updatePost($post_id, $title, $description, $due_date = null, $max_score = null)
     {
@@ -726,7 +727,7 @@ class ClassModel
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getAssignmentByPostId($post_id)
     {
@@ -762,7 +763,7 @@ class ClassModel
      *
      * @param mixed $post_id Post identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getPostAttachments($post_id)
     {
@@ -787,7 +788,7 @@ class ClassModel
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $activity_id Assignment activity identifier.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getAssignmentGrades($class_id, $activity_id)
     {
@@ -836,7 +837,7 @@ class ClassModel
      * @param mixed $activity_id Assignment activity identifier.
      * @param mixed $grade Grade value to save.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function saveStudentGrade($class_id, $student_id, $activity_id, $grade)
     {
@@ -880,7 +881,7 @@ class ClassModel
      * @param mixed $student_id Student user identifier involved in the operation.
      * @param mixed $activity_id Assignment activity identifier.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getStudentSubmission($class_id, $student_id, $activity_id)
     {
@@ -921,11 +922,20 @@ class ClassModel
      * @param mixed $activity_id Assignment activity identifier.
      * @param array $files Uploaded files array from the request.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
-    public function submitAssignmentFiles($class_id, $student_id, $activity_id, $files)
+    public function submitAssignmentFiles(int|string $class_id, int|string $student_id, int|string $activity_id, array $files): array
     {
         try {
+            $uploader = new Upload();
+
+            if (!$uploader->hasValidFiles($files)) {
+                return [
+                    'success' => false,
+                    'message' => 'Please choose at least one valid file.'
+                ];
+            }
+
             $sql = "SELECT class_user_id
                 FROM Class_User
                 WHERE class_id = ?
@@ -934,22 +944,29 @@ class ClassModel
                 LIMIT 1";
 
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$class_id, $student_id]);
+            $stmt->execute([
+                $class_id,
+                $student_id
+            ]);
+
             $classUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$classUser) {
-                return ['success' => false, 'message' => 'Student is not part of this class.'];
-            }
-
-            if (empty($files['name'][0])) {
-                return ['success' => false, 'message' => 'Please choose at least one file.'];
+                return [
+                    'success' => false,
+                    'message' => 'Student is not part of this class.'
+                ];
             }
 
             $this->conn->beginTransaction();
 
-            $sql = "INSERT INTO Submission (class_user_id, activity_id, submitted_at)
-                VALUES (:class_user_id, :activity_id, CURRENT_TIMESTAMP)
-                ON DUPLICATE KEY UPDATE submitted_at = CURRENT_TIMESTAMP";
+            $sql = "INSERT INTO Submission
+                    (class_user_id, activity_id, submitted_at, status)
+                VALUES
+                    (:class_user_id, :activity_id, CURRENT_TIMESTAMP, 'submitted')
+                ON DUPLICATE KEY UPDATE
+                    submitted_at = CURRENT_TIMESTAMP,
+                    status = 'submitted'";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
@@ -962,65 +979,77 @@ class ClassModel
                 WHERE class_user_id = ?
                 AND activity_id = ?
                 LIMIT 1";
+
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$classUser['class_user_id'], $activity_id]);
+            $stmt->execute([
+                $classUser['class_user_id'],
+                $activity_id
+            ]);
+
             $submission = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$submission) {
-                $this->conn->rollBack();
-                return ['success' => false, 'message' => 'Unable to create submission.'];
+                if ($this->conn->inTransaction()) {
+                    $this->conn->rollBack();
+                }
+
+                return [
+                    'success' => false,
+                    'message' => 'Unable to create submission.'
+                ];
             }
 
             $submission_id = $submission['submission_id'];
-            $uploadDir = 'documents/submissions/';
-            $publicDir = 'documents/submissions/';
 
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0775, true);
+            $uploadedFiles = $uploader->uploadSubmissionFiles(
+                $files,
+                $submission_id
+            );
+
+            if (empty($uploadedFiles)) {
+                if ($this->conn->inTransaction()) {
+                    $this->conn->rollBack();
+                }
+
+                return [
+                    'success' => false,
+                    'message' => 'No valid files were uploaded.'
+                ];
             }
 
-            $allowedExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'zip', 'rar', 'txt'];
-            $uploadedCount = 0;
+            $sql = "INSERT INTO Submission_Attachment
+                    (submission_id, file_name, file_path, file_type)
+                VALUES
+                    (?, ?, ?, ?)";
 
-            foreach ($files['name'] as $i => $fileName) {
-                if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-                    continue;
-                }
+            $stmt = $this->conn->prepare($sql);
 
-                $tmp = $files['tmp_name'][$i];
-                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-                if (!in_array($ext, $allowedExts, true)) {
-                    continue;
-                }
-
-                $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($fileName));
-                $newFileName = $submission_id . '_' . time() . '_' . uniqid() . '_' . $safeName;
-                $targetPath = $uploadDir . $newFileName;
-                $dbPath = $publicDir . $newFileName;
-
-                if (move_uploaded_file($tmp, $targetPath)) {
-                    $sql = "INSERT INTO Submission_Attachment (submission_id, file_name, file_path, file_type)
-                        VALUES (?, ?, ?, ?)";
-                    $stmt = $this->conn->prepare($sql);
-                    $stmt->execute([$submission_id, $fileName, $dbPath, $ext]);
-                    $uploadedCount++;
-                }
-            }
-
-            if ($uploadedCount === 0) {
-                $this->conn->rollBack();
-                return ['success' => false, 'message' => 'No valid files were uploaded.'];
+            foreach ($uploadedFiles as $file) {
+                $stmt->execute([
+                    $submission_id,
+                    $file['file_name'],
+                    $file['file_path'],
+                    $file['file_type']
+                ]);
             }
 
             $this->conn->commit();
-            return ['success' => true, 'message' => 'Assignment turned in successfully.'];
+
+            return [
+                'success' => true,
+                'message' => 'Assignment turned in successfully.'
+            ];
         } catch (\PDOException $e) {
             if ($this->conn->inTransaction()) {
                 $this->conn->rollBack();
             }
+
             error_log('Submit assignment error: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Unable to submit assignment.'];
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
@@ -1029,7 +1058,7 @@ class ClassModel
      *
      * @param mixed $submission_id Submission identifier used to find files.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getSubmissionFiles($submission_id)
     {
@@ -1059,7 +1088,7 @@ class ClassModel
      * @param mixed $student_id Student user identifier involved in the operation.
      * @param mixed $activity_id Assignment activity identifier.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getSubmissionFilesByStudent($class_id, $student_id, $activity_id)
     {
@@ -1083,7 +1112,7 @@ class ClassModel
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $user_id User identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function getClassForTeacher($class_id, $user_id)
     {
@@ -1125,7 +1154,7 @@ class ClassModel
      * @param mixed $user_id User identifier involved in the operation.
      * @param array $data Associative array of values required by the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function updateClass($class_id, $user_id, $data)
     {
@@ -1194,7 +1223,7 @@ class ClassModel
      * @param mixed $class_id Class identifier involved in the operation.
      * @param mixed $user_id User identifier involved in the operation.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function deleteClass($class_id, $user_id)
     {
@@ -1219,6 +1248,131 @@ class ClassModel
         } catch (\PDOException $e) {
             error_log("Archive class error: " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function unsubmitAssignment(int|string $class_id, int|string $student_id, int|string $activity_id): array
+    {
+        try {
+            $this->conn->beginTransaction();
+
+            $sql = "SELECT 
+                    s.submission_id
+                FROM Submission s
+                JOIN Class_User cu ON cu.class_user_id = s.class_user_id
+                WHERE cu.class_id = ?
+                AND cu.user_id = ?
+                AND cu.role = 'student'
+                AND s.activity_id = ?
+                LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                $class_id,
+                $student_id,
+                $activity_id
+            ]);
+
+            $submission = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$submission) {
+                if ($this->conn->inTransaction()) {
+                    $this->conn->rollBack();
+                }
+
+                return [
+                    'success' => false,
+                    'message' => 'No submission found.'
+                ];
+            }
+
+            $submission_id = $submission['submission_id'];
+
+            $sql = "SELECT file_path
+                FROM Submission_Attachment
+                WHERE submission_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$submission_id]);
+
+            $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $uploader = new Upload();
+
+            foreach ($files as $file) {
+                if (!empty($file['file_path'])) {
+                    $uploader->deleteFile($file['file_path']);
+                }
+            }
+
+            $sql = "DELETE FROM Submission_Attachment
+                WHERE submission_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$submission_id]);
+
+            $sql = "UPDATE Submission
+                SET status = 'unsubmitted',
+                    submitted_at = NULL
+                WHERE submission_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$submission_id]);
+
+            $this->conn->commit();
+
+            return [
+                'success' => true,
+                'message' => 'Assignment unsubmitted successfully.'
+            ];
+        } catch (\PDOException $e) {
+            if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+            }
+
+            error_log('Unsubmit assignment error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Unable to unsubmit assignment.'
+            ];
+        }
+    }
+
+    /**
+     * Retrieves archived classes joined or created by a user.
+     *
+     * This method is used by the archive classes page to display classes that
+     * are no longer active but still stored in the database for record keeping.
+     *
+     * @param int|string $user_id The user ID from the Users table.
+     * @return array Archived class records connected to the user.
+     */
+    public function getArchivedClassesByUser(int|string $user_id): array
+    {
+        try {
+            $sql = "SELECT
+                    c.class_id,
+                    c.class_name,
+                    c.class_desc,
+                    c.class_code,
+                    c.created_by,
+                    c.created_at,
+                    c.status,
+                    cu.role
+                FROM Classes c
+                JOIN Class_User cu ON c.class_id = cu.class_id
+                WHERE cu.user_id = ?
+                AND c.status = 'Inactive'
+                ORDER BY c.created_at DESC";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$user_id]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Get archived classes error: " . $e->getMessage());
+            return [];
         }
     }
 }
