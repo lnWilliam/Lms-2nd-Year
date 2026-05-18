@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Helpers\Sanitizer;
@@ -21,7 +23,7 @@ class UserController
      *
      * @param mixed $user User model dependency used for account lookup and persistence.
      * @return void No value is returned.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function __construct($user)
     {
@@ -36,7 +38,7 @@ class UserController
      *
      * @param array $input Input data collected from a form or JSON request.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateAndProcessLogin($input)
     {
@@ -55,6 +57,13 @@ class UserController
                 'errors' => ['Invalid username or password']
             ];
         }
+        
+        if (($user['status'] ?? '') === 'Inactive') {
+            return [
+                'success' => false,
+                'errors' => ['This account is inactive. Please contact the administrator.']
+            ];
+        }
 
         if (password_verify($sanitized['user_password'], $user['password'])) {
             unset($user['password']);
@@ -64,22 +73,21 @@ class UserController
                 'logged_in' => true,
                 'data' => $user
             ];
-        }
-        else{
-            return[
+        } else {
+            return [
                 'success' => false,
                 'errors' => ['Invalid username or password']
             ];
         }
     }
 
-    
+
     /**
      * Sanitizes, validates, hashes, and stores registration data so new users are created safely.
      *
      * @param array $input Input data collected from a form or JSON request.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateAndProcessRegistration($input)
     {
@@ -145,7 +153,7 @@ class UserController
         unset($sanitized['confirm_pass']);
 
         // Insert user
-        $userId = $this->user->insert($sanitized);
+        $userId = $this->user->insertUser($sanitized);
 
         if ($userId) {
             return [
@@ -172,7 +180,7 @@ class UserController
      *
      * @param mixed $username Username value to check or validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateUsernameOnly($username)
     {
@@ -196,14 +204,14 @@ class UserController
             'errors' => []
         ];
     }
-    
+
 
     /**
      * Sanitizes and validates only an email address for asynchronous registration checks.
      *
      * @param mixed $email Email address value to check or validate.
      * @return mixed Operation result used by the caller.
-     * @throws \Throwable If an unexpected runtime error occurs while the method is running.
+     *
      */
     public function validateEmailOnly($email)
     {

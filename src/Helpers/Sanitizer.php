@@ -22,7 +22,7 @@ class Sanitizer
      *
      * @param mixed $username Raw username value from a form or API request.
      * @return string Sanitized username safe for validation.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizeUsername(mixed $username): string
     {
@@ -46,7 +46,7 @@ class Sanitizer
      *
      * @param mixed $className Raw class name from a form or API request.
      * @return string Sanitized class name safe for validation.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizeClassName(mixed $className): string
     {
@@ -70,7 +70,7 @@ class Sanitizer
      *
      * @param mixed $email Raw email value from a form or API request.
      * @return string Sanitized email address.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizeEmail(mixed $email): string
     {
@@ -95,7 +95,7 @@ class Sanitizer
      *
      * @param mixed $password Raw password value from a form request.
      * @return string Trimmed password value.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizePassword(mixed $password): string
     {
@@ -114,7 +114,7 @@ class Sanitizer
      *
      * @param mixed $input Raw scalar input value.
      * @return string Sanitized string value.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizeString(mixed $input): string
     {
@@ -137,7 +137,7 @@ class Sanitizer
      *
      * @param mixed $id Raw identifier value.
      * @return int Integer identifier value.
-     * @throws \Throwable If an unexpected runtime error occurs while sanitizing the value.
+     *
      */
     public static function sanitizeId(mixed $id): int
     {
