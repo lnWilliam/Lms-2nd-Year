@@ -1,6 +1,6 @@
 # EduRift / MyLMS
 
-EduRift is a simple PHP learning management system. It supports user registration/login, class creation and joining, class streams, announcements, assignments, file attachments, assignment submission, unsubmission, and teacher grading.
+EduRift is a simple PHP learning management system. It supports user registration/login, class creation and joining, class streams, announcements, activities, file attachments, activity submission, unsubmission, and teacher grading.
 
 ## Project structure
 
@@ -73,8 +73,8 @@ Lms/
 |---|---|
 | `assets/pages/login.php` | Login and registration page |
 | `assets/pages/home.php` | Dashboard and class create/join page |
-| `assets/pages/class.php` | Class stream, announcements, assignments, students list |
-| `assets/pages/assignments.php` | Assignment details, student submission/unsubmission, teacher grading |
+| `assets/pages/class.php` | Class stream, announcements, activities, students list |
+| `assets/pages/activity.php` | Activity details, student submission/unsubmission, teacher grading |
 | `assets/pages/edit_class.php` | Teacher class edit page |
 | `assets/pages/delete_class.php` | Teacher class archive page |
 | `assets/pages/account_settings.php` | User account details page |
@@ -90,9 +90,9 @@ Lms/
 
 `home.php` lets users create or join classes. `ClassController` validates class data, and `ClassModel` inserts or fetches class records.
 
-### Assignments
+### Activities
 
-Teachers create assignments in `class.php`. Students open `assignments.php` to upload files. Teachers use the same page to view submissions and save grades.
+Teachers create activities in `class.php`. Students open `activity.php` to upload files. Teachers use the same page to view submissions and save grades.
 
 ### Unsubmit behavior
 

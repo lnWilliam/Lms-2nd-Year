@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     $archived = $classModel->deleteClass($class_id, $user['user_id']);
 
     if ($archived) {
-        header("Location: home.php");
+        header("Location: archive_classes.php");
         exit();
     }
 

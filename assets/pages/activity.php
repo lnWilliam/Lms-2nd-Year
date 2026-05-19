@@ -18,17 +18,17 @@ $database = Database::getInstance();
 $classModel = new ClassModel($database);
 
 if (!isset($_GET['post_id'])) {
-    die('No assignment selected.');
+    die('No activity selected.');
 }
 
 $post_id = (int) $_GET['post_id'];
-$assignment = $classModel->getAssignmentByPostId($post_id);
+$activity = $classModel->getActivityByPostId($post_id);
 
-if (!$assignment) {
-    die('Assignment not found.');
+if (!$activity) {
+    die('Activity not found.');
 }
 
-$class_id = (int) $assignment['class_id'];
+$class_id = (int) $activity['class_id'];
 $classes = $classModel->getClassesByUser($user_id);
 $currentClass = null;
 
@@ -50,85 +50,85 @@ $messageType = 'success';
 // TEACHER: save / update grade
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_grade'])) {
     if (!$isTeacher) {
-        die('Only teachers can grade assignments.');
+        die('Only teachers can grade activities.');
     }
 
     $student_id = (int) ($_POST['student_id'] ?? 0);
     $grade = $_POST['grade'] ?? null;
 
     if ($grade === '' || !is_numeric($grade)) {
-        $_SESSION['assignment_error'] = 'Grade must be a number.';
-    } elseif ((float)$grade < 0 || (float)$grade > (float)$assignment['max_score']) {
-        $_SESSION['assignment_error'] = 'Grade must be between 0 and ' . $assignment['max_score'] . '.';
+        $_SESSION['activity_error'] = 'Grade must be a number.';
+    } elseif ((float)$grade < 0 || (float)$grade > (float)$activity['max_score']) {
+        $_SESSION['activity_error'] = 'Grade must be between 0 and ' . $activity['max_score'] . '.';
     } else {
         $saved = $classModel->saveStudentGrade(
             $class_id,
             $student_id,
-            (int) $assignment['activity_id'],
+            (int) $activity['activity_id'],
             $grade
         );
 
-        $_SESSION[$saved ? 'assignment_success' : 'assignment_error'] =
+        $_SESSION[$saved ? 'activity_success' : 'activity_error'] =
             $saved ? 'Grade saved successfully.' : 'Unable to save grade.';
     }
 
-    header('Location: assignments.php?post_id=' . $post_id);
+    header('Location: activity.php?post_id=' . $post_id);
     exit();
 }
 
 // STUDENT: upload files and automatically turn in
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['turn_in_assignment'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['turn_in_activity'])) {
     if ($isTeacher) {
-        die('Teachers cannot submit this assignment.');
+        die('Teachers cannot submit this activity.');
     }
 
-    $result = $classModel->submitAssignmentFiles(
+    $result = $classModel->submitActivityFiles(
         $class_id,
         $user_id,
-        (int) $assignment['activity_id'],
+        (int) $activity['activity_id'],
         $_FILES['submission_files'] ?? []
     );
 
-    $_SESSION[$result['success'] ? 'assignment_success' : 'assignment_error'] = $result['message'];
+    $_SESSION[$result['success'] ? 'activity_success' : 'activity_error'] = $result['message'];
 
-    header('Location: assignments.php?post_id=' . $post_id);
+    header('Location: activity.php?post_id=' . $post_id);
     exit();
 }
 
-// STUDENT: unsubmit assignment
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubmit_assignment'])) {
+// STUDENT: unsubmit activity
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubmit_activity'])) {
     if ($isTeacher) {
-        die('Teachers cannot unsubmit this assignment.');
+        die('Teachers cannot unsubmit this activity.');
     }
 
-    $result = $classModel->unsubmitAssignment(
+    $result = $classModel->unsubmitActivity(
         $class_id,
         $user_id,
-        (int) $assignment['activity_id']
+        (int) $activity['activity_id']
     );
 
-    $_SESSION[$result['success'] ? 'assignment_success' : 'assignment_error'] = $result['message'];
+    $_SESSION[$result['success'] ? 'activity_success' : 'activity_error'] = $result['message'];
 
-    header('Location: assignments.php?post_id=' . $post_id);
+    header('Location: activity.php?post_id=' . $post_id);
     exit();
 }
 
-if (isset($_SESSION['assignment_success'])) {
-    $message = $_SESSION['assignment_success'];
+if (isset($_SESSION['activity_success'])) {
+    $message = $_SESSION['activity_success'];
     $messageType = 'success';
-    unset($_SESSION['assignment_success']);
-} elseif (isset($_SESSION['assignment_error'])) {
-    $message = $_SESSION['assignment_error'];
+    unset($_SESSION['activity_success']);
+} elseif (isset($_SESSION['activity_error'])) {
+    $message = $_SESSION['activity_error'];
     $messageType = 'danger';
-    unset($_SESSION['assignment_error']);
+    unset($_SESSION['activity_error']);
 }
 
 $gradeRows = $isTeacher
-    ? $classModel->getAssignmentGrades($class_id, (int) $assignment['activity_id'])
+    ? $classModel->getActivityGrades($class_id, (int) $activity['activity_id'])
     : [];
 
 $mySubmission = !$isTeacher
-    ? $classModel->getStudentSubmission($class_id, $user_id, (int) $assignment['activity_id'])
+    ? $classModel->getStudentSubmission($class_id, $user_id, (int) $activity['activity_id'])
     : null;
 
 $myFiles = (!$isTeacher && $mySubmission && !empty($mySubmission['submission_id']))
@@ -143,7 +143,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title><?= htmlspecialchars($assignment['title'] ?? 'Assignment') ?></title>
+    <title><?= htmlspecialchars($activity['title'] ?? 'Activity') ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/home.css">
@@ -232,7 +232,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
     <main class="main lms-main">
         <div class="hero lms-hero mb-3">
             <h2>
-                <?= htmlspecialchars($assignment['title']) ?>
+                <?= htmlspecialchars($activity['title']) ?>
                 <span class="badge bg-<?= $isTeacher ? 'danger' : 'secondary' ?>">
                     <?= ucfirst($currentClass['role']) ?>
                 </span>
@@ -252,19 +252,19 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                 <div class="card p-3 teacher-panel mb-3">
                     <h5>
                         <i class="fa-solid fa-circle-info me-1"></i>
-                        Assignment Details
+                        Activity Details
                     </h5>
 
                     <p class="mb-3">
-                        <?= nl2br(htmlspecialchars($assignment['description'] ?: 'No description provided.')) ?>
+                        <?= nl2br(htmlspecialchars($activity['description'] ?: 'No description provided.')) ?>
                     </p>
 
                     <div class="small text-muted mb-1">
-                        <strong>Due:</strong> <?= htmlspecialchars($assignment['due_date'] ?? 'No due date') ?>
+                        <strong>Due:</strong> <?= htmlspecialchars($activity['due_date'] ?? 'No due date') ?>
                     </div>
 
                     <div class="small text-muted mb-1">
-                        <strong>Points:</strong> <?= htmlspecialchars($assignment['max_score']) ?>
+                        <strong>Points:</strong> <?= htmlspecialchars($activity['max_score']) ?>
                     </div>
 
                     <a href="class.php?class_id=<?= $class_id ?>" class="btn btn-light btn-sm mt-3">
@@ -324,8 +324,8 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                             </ul>
 
                             <form method="POST"
-                                  onsubmit="return confirm('Are you sure you want to unsubmit this assignment? Your uploaded files will be removed.');">
-                                <button type="submit" name="unsubmit_assignment" class="btn btn-outline-danger w-100 mb-3">
+                                  onsubmit="return confirm('Are you sure you want to unsubmit this activity? Your uploaded files will be removed.');">
+                                <button type="submit" name="unsubmit_activity" class="btn btn-outline-danger w-100 mb-3">
                                     <i class="fa-solid fa-xmark me-1"></i>
                                     Unsubmit
                                 </button>
@@ -335,7 +335,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                 <label class="form-label">Upload more file/s</label>
                                 <input type="file" name="submission_files[]" class="form-control mb-3" multiple required>
 
-                                <button type="submit" name="turn_in_assignment" class="btn btn-primary w-100">
+                                <button type="submit" name="turn_in_activity" class="btn btn-primary w-100">
                                     Upload More Files
                                 </button>
                             </form>
@@ -344,7 +344,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                 <label class="form-label">Upload file/s to turn in</label>
                                 <input type="file" name="submission_files[]" class="form-control mb-3" multiple required>
 
-                                <button type="submit" name="turn_in_assignment" class="btn btn-primary w-100">
+                                <button type="submit" name="turn_in_activity" class="btn btn-primary w-100">
                                     Turn In
                                 </button>
                             </form>
@@ -380,7 +380,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                             $studentFiles = $classModel->getSubmissionFilesByStudent(
                                                 $class_id,
                                                 $row['user_id'],
-                                                (int) $assignment['activity_id']
+                                                (int) $activity['activity_id']
                                             );
                                             ?>
 
@@ -426,7 +426,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
                                                             type="number"
                                                             step="0.01"
                                                             min="0"
-                                                            max="<?= htmlspecialchars($assignment['max_score']) ?>"
+                                                            max="<?= htmlspecialchars($activity['max_score']) ?>"
                                                             name="grade"
                                                             class="form-control"
                                                             value="<?= htmlspecialchars($row['grade'] ?? '') ?>"
@@ -455,7 +455,7 @@ $teacherAttachments = $classModel->getPostAttachments($post_id);
 
                         <?php if ($mySubmission && $mySubmission['grade'] !== null): ?>
                             <p class="display-6 fw-bold mb-1">
-                                <?= htmlspecialchars($mySubmission['grade']) ?> / <?= htmlspecialchars($assignment['max_score']) ?>
+                                <?= htmlspecialchars($mySubmission['grade']) ?> / <?= htmlspecialchars($activity['max_score']) ?>
                             </p>
 
                             <?php if (!empty($mySubmission['submitted_at'])): ?>

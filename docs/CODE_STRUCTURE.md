@@ -28,7 +28,7 @@ Placeholder controller for future course features.
 Contains account and user database operations.
 
 ### `ClassModel.php`
-Contains class, post, assignment, attachment, submission, unsubmission, and grading database operations.
+Contains class, post, activity, attachment, submission, unsubmission, and grading database operations.
 
 ## `src/Utils`
 

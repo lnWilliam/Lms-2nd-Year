@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     /**
      * Handles every upload box on the page.
-     * This works for both the Announcement modal and the Assignment modal.
+     * This works for both the Announcement modal and the Activity modal.
      */
     document.querySelectorAll('.upload-section').forEach(function (section) {
         const fileInput = section.querySelector('input[type="file"]');

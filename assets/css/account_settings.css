@@ -819,3 +819,37 @@
         text-decoration: underline;
     }
 }
+
+/* Lively profile/settings accents */
+.profile-avatar {
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.38), transparent 24%),
+        linear-gradient(135deg, var(--lms-brand), var(--lms-brand-2));
+    outline: 8px solid rgba(14, 165, 233, 0.09);
+}
+
+.account-details-card,
+.settings-section,
+.password-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.account-details-card::after,
+.settings-section::after,
+.password-section::after {
+    content: "";
+    position: absolute;
+    right: -3rem;
+    top: -3rem;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 45% 55% 70% 30%;
+    background: linear-gradient(135deg, rgba(14,165,233,0.10), rgba(20,184,166,0.12));
+    pointer-events: none;
+}
+
+.account-info-row {
+    border-radius: 12px;
+    padding-inline: 0.75rem;
+}

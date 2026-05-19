@@ -33,6 +33,7 @@ if (isset($_SESSION['user_data'])) {
 }
 
 $classes = $classModel->getClassesByUser($user['user_id']);
+$classCount = is_array($classes) ? count($classes) : 0;
 $_SESSION['classes'] = $classes;
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -63,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     $class_code = strtoupper(trim($_POST['class_code']));
 
-    $result = $classModel->joinClassByCode($user['account_id'], $class_code);
+    $result = $classModel->joinClassByCode($user['user_id'], $class_code);
 
     if ($result['success']) {
       $_SESSION['success'] = $result['message'];
@@ -106,6 +107,7 @@ if (isset($_SESSION['success'])) {
 </head>
 
 <body>
+  <div class="lms-decor-scene" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <script src='../js/homescript.js'></script>
   <script src='../js/mobile-menu.js'></script>
   <!-- NAVBAR -->
@@ -250,39 +252,109 @@ if (isset($_SESSION['success'])) {
   <!-- MAIN -->
   <main class="main lms-main">
     <div class="hero lms-hero">
-      <h2>Welcome Back <?php echo isset($user) ? $user['first_name'] . " " . $user['last_name'] : "" ?>👋</h2>
+      <h2>Welcome Back <?php echo isset($user) ? htmlspecialchars($user['first_name'] . " " . $user['last_name'], ENT_QUOTES, 'UTF-8') : "" ?>👋</h2>
       <p>Continue where you left off—your next lesson is a click away.</p>
-      <div class="hero-meta">
+      <div class="hero-meta"></div>
+    </div>
+
+    <section class="home-overview-grid" aria-label="Dashboard overview">
+      <article class="home-mini-card home-mini-card-primary">
+        <span class="mini-icon" aria-hidden="true">📚</span>
+        <div>
+          <strong><?php echo $classCount; ?></strong>
+          <small>Active classes</small>
+        </div>
+      </article>
+      <article class="home-mini-card">
+        <span class="mini-icon" aria-hidden="true">⚡</span>
+        <div>
+          <strong>Ready</strong>
+          <small>Study space</small>
+        </div>
+      </article>
+      <article class="home-mini-card">
+        <span class="mini-icon" aria-hidden="true">🗂️</span>
+        <div>
+          <strong>Organized</strong>
+          <small>Files & lessons</small>
+        </div>
+      </article>
+    </section>
+
+    <!-- Classes -->
+    <div class="section-heading-row">
+      <div>
+        <h4 class="mb-1">📚 My Classes</h4>
+        <p class="section-subtitle mb-0">Create a class as a teacher or join one using the + Class menu in the top navbar.</p>
       </div>
     </div>
 
-    <!-- Classes -->
-    <h4 class="mb-3">📚 My Classes</h4>
+    <?php if ($classCount === 0): ?>
+      <section class="empty-home-shell" aria-label="No classes yet">
+        <div class="empty-hero-card">
+          <div class="empty-art" aria-hidden="true">
+            <span class="art-orbit"></span>
+            <span class="art-window"></span>
+            <span class="art-book art-book-1"></span>
+            <span class="art-book art-book-2"></span>
+            <span class="art-pencil"></span>
+            <span class="art-spark art-spark-1"></span>
+            <span class="art-spark art-spark-2"></span>
+          </div>
+          <div class="empty-copy">
+            <span class="eyebrow">No classes yet</span>
+            <h3>Your dashboard is waiting for its first class.</h3>
+            <p>You have not created or joined any class yet. Use the <strong>+ Class</strong> button in the top navbar to create or join your first class.</p>
+          </div>
+        </div>
 
-    <div class="row g-4">
-      <?php
-      if (isset($_SESSION['classes'])) {
+        <div class="home-static-grid">
+          <article class="static-panel tip-panel">
+            <div class="panel-kicker">Getting started</div>
+            <h5>What happens after you add a class?</h5>
+            <ul class="pretty-list">
+              <li><span>1</span> Your class appears here as a card.</li>
+              <li><span>2</span> You can open lessons, activities, and announcements.</li>
+              <li><span>3</span> Teachers can manage submissions and grades.</li>
+            </ul>
+          </article>
 
-        foreach ($classes as $classes) {
-          $id = '"' . $classes['class_id'] . '"';
-          if ($classes['class_desc'] === "") {
-            $classes['class_desc'] = 'No description';
-          }
-          echo '<div class="col-md-4 text-center">
+          <article class="static-panel quote-panel">
+            <span class="quote-mark" aria-hidden="true">“</span>
+            <h5>Build your learning space one class at a time.</h5>
+            <p>Small setup first, clean workflow later. No rush, bro.</p>
+          </article>
+
+          <article class="static-panel checklist-panel">
+            <div class="panel-kicker">Quick checklist</div>
+            <label><input type="checkbox" disabled> Prepare class name</label>
+            <label><input type="checkbox" disabled> Add short description</label>
+            <label><input type="checkbox" disabled> Share or enter class code</label>
+          </article>
+        </div>
+      </section>
+    <?php else: ?>
+      <div class="row g-4">
+        <?php
+          foreach ($classes as $classItem) {
+            $className = htmlspecialchars($classItem['class_name'] ?? 'Untitled Class', ENT_QUOTES, 'UTF-8');
+            $classDesc = trim($classItem['class_desc'] ?? '') === '' ? 'No description' : htmlspecialchars($classItem['class_desc'], ENT_QUOTES, 'UTF-8');
+            $classId = htmlspecialchars((string)$classItem['class_id'], ENT_QUOTES, 'UTF-8');
+            echo '<div class="col-md-4 text-center">
                     <div class="card p-3 shadow-sm">
-                      <h5>' . $classes['class_name'] . '</h5>
-                      <p>' . $classes['class_desc'] . '</p>
+                      <h5>'.$className.'</h5>
+                      <p>'.$classDesc.'</p>
                       <div class="progress mb-2">
                         <div class="progress-bar" style="width: 70%"></div>
                       </div>
-                      <a href="class.php?class_id=' . $classes['class_id'] . '"class="btn btn-primary btn-sm">Continue</a>
+                      <a href="class.php?class_id='.$classId.'" class="btn btn-primary btn-sm">Continue</a>
                     </div>
                   </div>';
-        }
-      }
-      ?>
-    </div>
-    </div>
+          }
+        ?>
+      </div>
+    <?php endif; ?>
+  </main>
     <?php if (isset($message)): ?>
       <div class="position-fixed start-50 translate-middle-x" style="top: 30%; z-index: 11;">
         <div id="myToast" class="toast message <?php echo $messageType; ?> border-0">
@@ -311,7 +383,7 @@ if (isset($_SESSION['success'])) {
       }
 
       function handleScroll() {
-        document.querySelectorAll(".card, .stat-box").forEach(el => {
+        document.querySelectorAll(".card, .stat-box, .home-mini-card, .empty-hero-card, .static-panel").forEach(el => {
           if (isInViewport(el)) {
             el.classList.add("animate-up");
           }

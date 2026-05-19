@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS Class_User(
     class_id INT NOT NULL,
     user_id INT NOT NULL,
     role ENUM('student', 'teacher') NOT NULL,
+    status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active',
     PRIMARY KEY(class_user_id),
     join_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (class_id) REFERENCES Classes(class_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -62,10 +63,9 @@ CREATE TABLE Post (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     class_id INT NOT NULL,
     postedBy INT NOT NULL,
-    type ENUM('assignment','announcement') NOT NULL,
+    type ENUM('activity','announcement') NOT NULL,
     title VARCHAR(255),
     description TEXT,
-    due_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (class_id) REFERENCES Classes(class_id)
@@ -78,6 +78,7 @@ CREATE TABLE Post (
 CREATE TABLE Activity (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL UNIQUE,
+    due_date DATETIME NULL,
 	max_score INT DEFAULT 100,
 	allow_late BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (post_id) REFERENCES Post(post_id)
@@ -86,13 +87,13 @@ CREATE TABLE Activity (
 
 CREATE TABLE IF NOT EXISTS Submission(
 	submission_id INT AUTO_INCREMENT NOT NULL,
-    class_user_id INT NOT NULL,
+    user_id INT NOT NULL,
     activity_id INT NOT NULL,
-    grade DECIMAL(5,2) ,
+    grade DECIMAL(5,2),
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status varchar(50) DEFAULT 'Submitted',
+    status VARCHAR(50) DEFAULT 'submitted',
     PRIMARY KEY(submission_id),
-    FOREIGN KEY (class_user_id) REFERENCES Class_User(class_user_id)
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
     FOREIGN KEY (activity_id) REFERENCES Activity(activity_id)
@@ -135,11 +136,12 @@ ALTER TABLE Class_User
 ADD UNIQUE (class_id, user_id);
 
 ALTER TABLE Submission
-ADD UNIQUE (class_user_id, activity_id);
+ADD UNIQUE (user_id, activity_id);
 
 CREATE INDEX idx_class_user_class ON Class_User(class_id);
 CREATE INDEX idx_post_user ON Post(postedBy);
 CREATE INDEX idx_submission_activity ON Submission(activity_id);
+CREATE INDEX idx_submission_user ON Submission(user_id);
 CREATE INDEX idx_class_user_user ON Class_User(user_id);
 CREATE INDEX idx_post_class_user_combo ON Post(class_id, postedBy);
 CREATE INDEX idx_post_class_type ON Post(class_id, type);
